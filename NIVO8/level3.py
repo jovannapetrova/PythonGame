@@ -20,7 +20,7 @@ screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREE
 pygame.display.set_caption("Бојење по броеви со click и слободно цртање")
 
 # Вчитај ја сликата и конвертирај ја
-background_tmp = pygame.image.load("flower1.jpg")
+background_tmp = pygame.image.load("house.png")
 background = background_tmp.convert()
 
 clouds_tmp = pygame.image.load("backg.png").convert()
@@ -69,7 +69,7 @@ for a in areas:
     a["color"] = None
     a["visited"] = False  # ново: за проверка дали е боено правилно
 
-final_image = pygame.image.load("final.png").convert_alpha()
+final_image = pygame.image.load("finalhouse.png").convert_alpha()
 
 # Намалување и позиционирање на финалната слика - централно во десниот дел
 # Скалирање на финалната слика - околу 30% од ширината на екранот
@@ -208,7 +208,7 @@ def main():
                 pygame.draw.circle(draw_surface, selected_color + (255,), (local_x, local_y), 10)
 
             if all_colored():
-                if not finished:  # пушти звук само еднаш
+                if not finished:
                     pygame.mixer.Sound("correct.wav").play()
                 finished = True
 

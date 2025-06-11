@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 
 pygame.init()
 
@@ -8,22 +9,49 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
 
 pygame.display.set_caption("Сортирање предмети (Drag and Drop)")
+results_button_rect = pygame.Rect(0, 0, 160, 55)
+new_player_button_rect = pygame.Rect(0, 0, 160, 55)
+pygame.init()
+pygame.mixer.init()
 
+wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
+correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
+# Функција за вчитување слики со обработка на грешки
+def load_image(name, scale=None):
+    try:
+        image = pygame.image.load(name)
+        if scale:
+            image = pygame.transform.scale(image, scale)
+        return image
+    except Exception as e:
+        print(f"Грешка при вчитување на сликата {name}: {e}")
+        # Создај празна површина како fallback
+        return pygame.Surface((100, 100), pygame.SRCALPHA)
+
+
+# Вчитување на сите слики
 try:
-    background = pygame.image.load("../pictures/brownclouds.jpg")
-    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+    background = load_image("../pictures/landscape.png", (WIDTH, HEIGHT))
+    panda_img = load_image("../pictures/panda.png", (100, 100))
+    blue_basket_img = load_image("../pictures/bluebucket.png", (250, 250))
+    red_basket_img = load_image("../pictures/redbucket.png", (250,250))
+    panda_body_img = load_image("../pictures/sittingpanda.png", (200, 200))
 except Exception as e:
-    print(f"Грешка при вчитување на сликата: {e}")
+    print(f"Грешка при вчитување на сликите: {e}")
     pygame.quit()
     sys.exit()
 
-font = pygame.font.SysFont(None, 40)
-title_font = pygame.font.SysFont(None, 60, bold=False)
-
+font = pygame.font.SysFont("Arial", 40)
+title_font = pygame.font.SysFont("Arial", 50, bold=True)
+bravo_font = pygame.font.SysFont("Arial", 80, bold=True)
+small_font=pygame.font.SysFont("Arial", 30, bold=True)
 players = []
 current_player_index = -1  # нема активен играч на почеток
 scores = {}
 current_player = ""
+show_bravo = False
+bravo_timer = 0
+
 
 def add_new_player():
     global current_player_index, current_player
@@ -33,60 +61,87 @@ def add_new_player():
     current_player_index = len(players) - 1
     current_player = new_player_name
 
-button_rect = pygame.Rect(10, HEIGHT - 50, 120, 40)
-new_player_button_rect = pygame.Rect(button_rect.right + 20, HEIGHT - 50, 150, 40)
 
 # Кутиите ќе ги подредиме хоризонтално, низ долната третина од екранот
 box_width, box_height = 150, 150
 box_spacing = 100
 boxes = {}
 start_x = (WIDTH - (len(tasks := [
-    {"color": (0, 0, 255), "shape": "circle", "box": "blue", "description": "Стави ги сите сини кругови во сината кутија."},
-    {"color": (255, 0, 0), "shape": "triangle", "box": "red", "description": "Стави ги сите црвени триаголници во црвената кутија."},
-]) * box_width + (len(tasks) - 1) * box_spacing)) // 2
+    {"color": (0, 100, 255), "shape": "circle", "box": "blue",
+     "description": "Стави ги сите сини кругови во сината кошница."},
+    {"color": (255, 50, 50), "shape": "triangle", "box": "red",
+     "description": "Стави ги сите црвени триаголници во црвената кошница."},
+{"color": (0, 100, 255), "shape": "triangle", "box": "blue",
+     "description": "Стави ги сите сини триаголници во сината кошница."},
+    {"color": (255, 50, 50), "shape": "square", "box": "red",
+     "description": "Стави ги сите црвени квадрати во црвената кошница."},
+
+
+]) * box_width + (len(tasks) - 1) * box_spacing)) // 2 -270
 for i, task in enumerate(tasks):
     boxes[task["box"]] = pygame.Rect(
         start_x + i * (box_width + box_spacing),
-        int(HEIGHT * 0.7),  # долу
+        int(HEIGHT * 0.5),  # долу
         box_width,
         box_height
     )
+
 add_new_player()
-# Предмети ќе ги подредиме хоризонтално на горната половина
+
+
+import random
+
 def reset_items_for_task():
-    global items, scored_items
+    global items, scored_items, show_bravo, bravo_timer
     task = tasks[current_task_index]
     items = []
-    scored_items = set()  # За да не се бодуваат повеќе пати истите предмети
-    num_correct = 3
+    scored_items = set()
+    num_correct = 3  # број на точни предмети
+    num_wrong = 2    # број на погрешни предмети
     spacing = 150
-    total_width = (num_correct + 2) * spacing  # 3 correct + 2 challenge
-    start_x_items = (WIDTH - total_width) // 2 + spacing // 2
 
-    # Правиме предмети со посакуваната боја и форма
-    for i in range(num_correct):
-        items.append({
-            "color": task["color"],
-            "pos": [start_x_items + i * spacing, int(HEIGHT * 0.3)],
-            "radius": 30,
-            "dragging": False,
-            "shape": task["shape"],
-            "scored": False,  # дали предметот веќе е бодуван
-            "locked": False   # дали предметот е заклучен во кутијата
-        })
-    # Два предизвикувачки предмети
-    other_color = (255, 0, 0) if task["color"] != (255, 0, 0) else (0, 0, 255)
-    other_shape = "circle" if task["shape"] != "circle" else "triangle"
-    for i in range(2):
-        items.append({
-            "color": other_color,
-            "pos": [start_x_items + (num_correct + i) * spacing, int(HEIGHT * 0.3)],
-            "radius": 30,
-            "dragging": False,
-            "shape": other_shape,
-            "scored": False,
-            "locked": False
-        })
+    # Правиме листа со предмети - прво точни
+    correct_items = [{
+        "color": task["color"],
+        "shape": task["shape"],
+        "radius": 30,
+        "dragging": False,
+        "scored": False,
+        "locked": False
+    } for _ in range(num_correct)]
+
+    # Потоа предмети со спротивна боја и/или форма
+    other_color = (255, 50, 50) if task["color"] != (255, 50, 50) else (0, 100, 255)
+    shapes = ["circle", "triangle", "square"]
+    other_shapes = [s for s in shapes if s != task["shape"]]
+    other_shape = random.choice(other_shapes)
+
+    wrong_items = [{
+        "color": other_color,
+        "shape": other_shape,
+        "radius": 30,
+        "dragging": False,
+        "scored": False,
+        "locked": False
+    } for _ in range(num_wrong)]
+
+    # Сите предмети заедно
+    items = correct_items + wrong_items
+
+    # Измешај ги предметите
+    random.shuffle(items)
+
+    # Постави ги на хоризонтална линија, распоредени и измешани
+    total_width = len(items) * spacing
+    start_x_items = (WIDTH - total_width) // 2 + spacing // 2
+    item_y_position = int(HEIGHT * 0.4)
+
+    for i, item in enumerate(items):
+        item["pos"] = [start_x_items + i * spacing, item_y_position]
+
+    show_bravo = False
+    bravo_timer = 0
+
 
 current_task_index = 0
 reset_items_for_task()
@@ -95,30 +150,101 @@ dragging_item = None
 offset_x = 0
 offset_y = 0
 
+
 def draw_triangle(surface, color, pos, size):
     x, y = pos
     points = [(x, y - size), (x - size, y + size), (x + size, y + size)]
     pygame.draw.polygon(surface, color, points)
+def draw_shadowed_circle(surface, color, pos, radius):
+    # Креирај површина со alpha канал
+    shadow_surf = pygame.Surface((radius * 4, radius * 4), pygame.SRCALPHA)
 
-def draw_3d_box(surface, rect, base_color):
-    # Сенка (shadow)
-    shadow_offset = 5
-    shadow_rect = pygame.Rect(rect.x + shadow_offset, rect.y + shadow_offset, rect.width, rect.height)
-    pygame.draw.rect(surface, (50, 50, 50), shadow_rect, border_radius=10)
+    # Црна боја со alpha 100 (од 0 до 255)
+    shadow_color = (0, 0, 0, 100)
 
-    # Основна кутија
-    pygame.draw.rect(surface, base_color, rect, border_radius=10)
+    # Центар на сенката на површината
+    shadow_center = (radius * 2 + 3, radius * 2 + 3)  # +3 за поместување
 
-    # Внатрешна сенка (темен раб од долу и десно)
-    pygame.draw.line(surface, (0, 0, 0), rect.bottomleft, rect.bottomright, 3)
-    pygame.draw.line(surface, (0, 0, 0), rect.topright, rect.bottomright, 3)
+    pygame.draw.circle(shadow_surf, shadow_color, shadow_center, radius)
 
-    # Светол раб (од горе и лево)
-    light_color = tuple(min(255, c + 100) for c in base_color)
-    pygame.draw.line(surface, light_color, rect.topleft, rect.topright, 3)
-    pygame.draw.line(surface, light_color, rect.topleft, rect.bottomleft, 3)
+    # Блитнувај ја сенката на главниот екран, позицијата ја намали за да биде правилно поставено
+    surface.blit(shadow_surf, (pos[0] - radius * 2, pos[1] - radius * 2))
 
-def draw_3d_button(surface, rect, base_color, text, font):
+    # Цртај кругот врз сенката
+    pygame.draw.circle(surface, color, pos, radius)
+
+
+def draw_rounded_rect(surface, color, rect, radius=20):
+    pygame.draw.rect(surface, color, rect, border_radius=radius)
+
+def draw_simple_button(surface, rect, color, border_color, text, font, text_color=(0, 0, 0)):
+    # Надворешен светол раб
+    pygame.draw.rect(surface, border_color, rect, border_radius=15, width=3)
+    # Внатрешност
+    pygame.draw.rect(surface, color, rect.inflate(-6, -6), border_radius=12)
+    # Текст
+    text_surf = font.render(text, True, text_color)
+    surface.blit(text_surf, (rect.centerx - text_surf.get_width() // 2,
+                             rect.centery - text_surf.get_height() // 2))
+
+# Updated player panel and bravo panel positions with more spacing
+def draw_player_panel():
+    # Move panel down (increased y position from 20 to 50)
+    player_rect = pygame.Rect(120, 50, 300, 80)  # Changed y from 20 to 50
+    draw_rounded_rect(screen, (0, 50, 120), player_rect, 40)
+
+    # Adjust panda image position to match
+    screen.blit(panda_img, (player_rect.left - 70, player_rect.centery - 50))
+
+    player_text = title_font.render(current_player, True, (255, 255, 255))
+    screen.blit(player_text, (player_rect.x + 50, player_rect.centery - player_text.get_height() // 2))
+
+def draw_bravo_panel():
+    if all(item["scored"] or item["locked"] for item in items if item.get("correct", False)):
+        bravo_text = bravo_font.render("", True, (0, 30, 100))
+        # Постави текстот на некоја фиксна позиција (на пример, 450, 80)
+        screen.blit(bravo_text, (450, 50))
+
+
+def draw_instruction_panel():
+    panel_width = WIDTH // 2
+    instr_rect = pygame.Rect((WIDTH - panel_width) // 2, 140, panel_width, 80)
+    draw_rounded_rect(screen, (150, 200, 255), instr_rect, 20)
+
+    current_task = tasks[current_task_index]
+    words = current_task["description"].split()
+    if not words:
+        return
+
+    wrapped_text = []
+    current_line = words[0]
+
+    for word in words[1:]:
+        test_line = current_line + " " + word
+        if font.size(test_line)[0] < instr_rect.width - 40:
+            current_line = test_line
+        else:
+            wrapped_text.append(current_line)
+            current_line = word
+    wrapped_text.append(current_line)
+
+    # Ограничување по висина (опционално)
+    max_lines = (instr_rect.height - 40) // 30
+    if len(wrapped_text) > max_lines:
+        wrapped_text = wrapped_text[:max_lines]
+        wrapped_text[-1] += "..."
+
+    # Прикажи текст внатре во правоаголникот
+    for i, line in enumerate(wrapped_text):
+        line_surface = small_font.render(line, True, (0, 50, 150))
+        screen.blit(line_surface, (
+            instr_rect.centerx - line_surface.get_width() // 2,
+            instr_rect.y + 20 + i * 30
+        ))
+
+
+
+def draw_3d_button(surface, rect, base_color, highlight_color, text, font):
     # Сенка
     shadow_offset = 4
     shadow_rect = pygame.Rect(rect.x + shadow_offset, rect.y + shadow_offset, rect.width, rect.height)
@@ -127,19 +253,19 @@ def draw_3d_button(surface, rect, base_color, text, font):
     # Основно копче
     pygame.draw.rect(surface, base_color, rect, border_radius=12)
 
-    # Темни рабови долу и десно
-    pygame.draw.line(surface, (0, 0, 0), rect.bottomleft, rect.bottomright, 3)
-    pygame.draw.line(surface, (0, 0, 0), rect.topright, rect.bottomright, 3)
+    # Highlight ефект
+    highlight_rect = pygame.Rect(rect.x, rect.y, rect.width, rect.height // 2)
+    pygame.draw.rect(surface, highlight_color, highlight_rect, border_radius=12)
 
-    # Светли рабови горе и лево
-    light_color = tuple(min(255, c + 80) for c in base_color)
-    pygame.draw.line(surface, light_color, rect.topleft, rect.topright, 3)
-    pygame.draw.line(surface, light_color, rect.topleft, rect.bottomleft, 3)
+    # Темни рабови долу и десно
+    pygame.draw.line(surface, (0, 0, 0), (rect.left + 5, rect.bottom - 5), (rect.right - 5, rect.bottom - 5), 3)
+    pygame.draw.line(surface, (0, 0, 0), (rect.right - 5, rect.top + 5), (rect.right - 5, rect.bottom - 5), 3)
 
     # Текст
     text_surf = font.render(text, True, (0, 0, 0))
-    surface.blit(text_surf, (rect.x + (rect.width - text_surf.get_width()) // 2,
-                             rect.y + (rect.height - text_surf.get_height()) // 2))
+    surface.blit(text_surf, (rect.centerx - text_surf.get_width() // 2,
+                             rect.centery - text_surf.get_height() // 2))
+
 
 def draw_results_screen():
     # Светло кафеава позадина
@@ -175,8 +301,16 @@ def draw_results_screen():
         back_button_width,
         back_button_height
     )
-    # 3D копче
-    draw_3d_button(screen, back_button_rect, (150, 75, 0), "Назад", font)
+
+    # Цртање заоблен правоаголник (без бордер)
+    pygame.draw.rect(screen, (255, 165, 0), back_button_rect, border_radius=15)
+
+    # Текстот на копчето
+    text_surf = font.render("Назад", True, (0, 0, 0))  # црн текст
+    screen.blit(text_surf, (
+        back_button_rect.centerx - text_surf.get_width() // 2,
+        back_button_rect.centery - text_surf.get_height() // 2
+    ))
 
     pygame.display.flip()
 
@@ -192,13 +326,68 @@ def draw_results_screen():
                 if back_button_rect.collidepoint(pos):
                     waiting = False
 
-def is_item_in_box(item, box_rect):
+
+def is_item_in_box(item, box_rect, margin=0):
     x, y = item["pos"]
-    # Проверуваме дали центарот на предметот е во границите на кутијата
+    r = item.get("radius", 0)
+
+    # Ако е круг - дозволуваме маргина за да не бараме целосен внатре
+    if item["shape"] == "circle":
+        return (x + r - margin) >= box_rect.left and (x - r + margin) <= box_rect.right and \
+            (y + r - margin) >= box_rect.top and (y - r + margin) <= box_rect.bottom
+
+    # За квадрат и триаголник - приближно bounding box
+    size = r
+    if item["shape"] in ["square", "triangle"]:
+        left = x - size
+        right = x + size
+        top = y - size
+        bottom = y + size
+        return (right - margin) >= box_rect.left and (left + margin) <= box_rect.right and \
+            (bottom - margin) >= box_rect.top and (top + margin) <= box_rect.bottom
+
+    # Default fallback
     return box_rect.collidepoint(x, y)
 
+
+def draw_shadowed_triangle(surface, color, pos, size):
+    shadow_surf = pygame.Surface((size * 6, size * 6), pygame.SRCALPHA)
+    shadow_color = (0, 0, 0, 100)
+    offset = 3
+
+    # Функција за точки (повеќе ги поместуваме за да не излезат од површината)
+    x, y = size * 3, size * 3  # Центар на површината
+    points = [(x, y - size), (x - size, y + size), (x + size, y + size)]
+
+    # Сенка (поместена)
+    shadow_points = [(px + offset, py + offset) for px, py in points]
+    pygame.draw.polygon(shadow_surf, shadow_color, shadow_points)
+
+    # Триаголник
+    pygame.draw.polygon(shadow_surf, color, points)
+
+    # Блитнувај ја површината на главниот екран со позиција прилагодена
+    surface.blit(shadow_surf, (pos[0] - size * 3, pos[1] - size * 3))
+def draw_square(surface, color, pos, size):
+    x, y = pos
+    rect = pygame.Rect(x - size, y - size, size * 2, size * 2)
+    pygame.draw.rect(surface, color, rect)
+
+# При цртање предмети
+for item in items:
+    pos = item["pos"]
+    color = item["color"]
+    if item["shape"] == "circle":
+        draw_shadowed_circle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+    elif item["shape"] == "triangle":
+        draw_shadowed_triangle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+    elif item["shape"] == "square":
+        draw_square(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+
+
+
 def check_and_score_items():
-    global scores, current_player_index, current_player, current_task_index, items
+    global scores, current_player_index, current_player, current_task_index, items, show_bravo, bravo_timer
     task = tasks[current_task_index]
     box_rect = boxes[task["box"]]
 
@@ -208,19 +397,30 @@ def check_and_score_items():
     new_items = []
     for item in items:
         is_correct = item["color"] == task["color"] and item["shape"] == task["shape"]
+
         if is_correct:
             num_correct_items += 1
             if is_item_in_box(item, box_rect):
                 num_correct_in_box += 1
                 if not item["scored"]:
-                    scores[current_player] += 1
-                # Не го додаваме овој предмет во новата листа → ќе "исчезне"
-                continue
+                    scores[current_player] += 5  # Повеќе поени за успех
+                    item["scored"] = True
+                    item["locked"] = True
+                    correct_sound.play()  # ✅ Пушти "correct" звук
+                    show_bravo = True
+                    bravo_timer = pygame.time.get_ticks()
+                continue  # Не го додаваме во новата листа → исчезнува
             else:
-                if item["scored"]:
-                    scores[current_player] -= 1
-                item["scored"] = False
-        new_items.append(item)
+                # ⛔ Точен предмет, но не е во кутијата – не правиме ништо
+                new_items.append(item)
+        else:
+            # Погрешен предмет
+            if is_item_in_box(item, box_rect) and not item["locked"]:
+                wrong_sound.play()  # ⛔ Пушти "wrong" звук
+                item["locked"] = True
+                all_correct = False
+            new_items.append(item)
+
     items = new_items
 
     if num_correct_in_box == num_correct_items and num_correct_items > 0:
@@ -231,13 +431,23 @@ def check_and_score_items():
             current_task_index = 0
         reset_items_for_task()
 
+
+# Дефинирање на копчињата
+button_rect = pygame.Rect(WIDTH // 2 - 320, HEIGHT - 80, 200, 60)
+new_player_button_rect = pygame.Rect(WIDTH // 2 + 120, HEIGHT - 80, 200, 60)
+
+
 def main():
-    global dragging_item, offset_x, offset_y, current_player_index, current_player
+    global dragging_item, offset_x, offset_y, current_player_index, current_player, show_bravo, bravo_timer
 
     clock = pygame.time.Clock()
     running = True
 
     while running:
+        current_time = pygame.time.get_ticks()
+        if show_bravo and current_time - bravo_timer > 2000:  # 2 секунди
+            show_bravo = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -277,41 +487,70 @@ def main():
         # Цртање
         screen.blit(background, (0, 0))
 
-        # Текст горе, центриран
-        current_task = tasks[current_task_index]
-        title_text = current_task["description"]
-        title_surf = title_font.render(title_text, True, (255, 255, 255))
-        title_x = (WIDTH - title_surf.get_width()) // 2
-        title_y = int(HEIGHT * 0.15)
-        screen.blit(title_surf, (title_x, title_y))
+        # Слика од панда долу лево
+        screen.blit(panda_body_img, (50, HEIGHT - panda_body_img.get_height() - 50))
 
-        # Кутиите
-        for key, rect in boxes.items():
-            base_color = (0, 0, 255) if key == "blue" else (255, 0, 0)
-            draw_3d_box(screen, rect, base_color)
-            # Отстрани го прикажувањето на текстот над кутиите
+        # Панели
+        draw_player_panel()
+        draw_bravo_panel()
+        draw_instruction_panel()
 
         # Предметите
         for item in items:
             pos = item["pos"]
             color = item["color"]
             if item["shape"] == "circle":
-                pygame.draw.circle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+                draw_shadowed_circle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
             elif item["shape"] == "triangle":
-                draw_triangle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+                draw_shadowed_triangle(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+            elif item["shape"] == "square":
+                draw_square(screen, color, (int(pos[0]), int(pos[1])), item["radius"])
+        # Кошниците (користејќи слики)
+        for key, rect in boxes.items():
+            if key == "blue":
+                screen.blit(blue_basket_img, rect)
+            else:
+                screen.blit(red_basket_img, rect)
 
-        # Поени и играч
-        score_text = font.render(f"Играч: {current_player}  |  Поени: {scores[current_player]}", True, (255, 255, 255))
-        screen.blit(score_text, (10, 10))
+        # Копчиња
+        # Големина на копчиња
+        button_width = 160
+        button_height = 55
 
-        # Копчиња 3D
-        draw_3d_button(screen, button_rect, (150, 75, 0), "Резултати", font)
-        draw_3d_button(screen, new_player_button_rect, (150, 75, 0), "Нов играч", font)
+        # Копче "Резултати" под сината кошничка
+        results_button_rect = pygame.Rect(
+            boxes["blue"].centerx - button_width // 2,
+            boxes["blue"].bottom + 200,
+            button_width,
+            button_height
+        )
+       # results_button_rect.x += 50
+
+        # Копче "Нов играч" под црвената кошничка
+        new_player_button_rect = pygame.Rect(
+            boxes["red"].centerx - button_width // 2+50,
+            boxes["red"].bottom + 200,
+            button_width,
+            button_height
+        )
+
+
+        # Бои
+        blue_button_color = (173, 216, 230)
+        blue_border_color = (224, 255, 255)
+
+        red_button_color = (255, 182, 193)
+        red_border_color = (255, 228, 225)
+
+        # Цртање
+        draw_simple_button(screen, results_button_rect, blue_button_color, blue_border_color, "Резултати", font)
+        draw_simple_button(screen, new_player_button_rect, red_button_color, red_border_color, "Нов играч", font)
 
         pygame.display.flip()
         clock.tick(60)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()

@@ -62,7 +62,7 @@ def show_feedback(is_correct):
     if is_correct:
         correct_sound.play()
         img = confetti_img
-        text = "Браво! Точен одговор!"
+        text = "                 Браво! Точен одговор!"
         color = GREEN
         bg_color = WHITE  # Боја за цел екран кога е точен одговор
     else:

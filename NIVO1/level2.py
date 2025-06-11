@@ -11,7 +11,7 @@ WIDTH, HEIGHT = infoObject.current_w, infoObject.current_h
 
 # Постави fullscreen
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
-pygame.display.set_caption("Направи пица!")
+pygame.display.set_caption("Направи торта!")
 font = pygame.font.SysFont(None, 40)
 
 # Colors
@@ -36,10 +36,10 @@ def crop_surface_to_circle(surface):
 
 # Load images for ingredients
 images = {
-    "dough": pygame.image.load("../pictures/dough.png"),
-    "sauce": pygame.image.load("../pictures/tomatosauce.png"),
-    "cheese": pygame.image.load("../pictures/cheese.png"),
-    "veggies": pygame.image.load("../pictures/vegetables.png")
+    "dough": pygame.image.load("cakedough.png"),
+    "sauce": pygame.image.load("../pictures/pink.png"),
+    "cheese": pygame.image.load("../pictures/strawberries.png"),
+    "veggies": pygame.image.load("../pictures/candles.png")
 }
 
 # За fullscreen - задаваме ingredient_size пропорционално на висината на екранот
@@ -54,17 +54,21 @@ WIDTH, HEIGHT = screen.get_size()
 # После ова, скалирај ја сликата:
 table_img = pygame.image.load("background.png").convert()
 table_img = pygame.transform.smoothscale(table_img, (WIDTH, HEIGHT))
+
+bg = pygame.image.load("background.png")
+print("BG SIZE:", bg.get_width(), bg.get_height())
+
 pizza_stages = [
-    pygame.image.load("../pictures/doughpizzaarea.png"),  # dough only
-    pygame.image.load("pizza_1.png"),  # dough + sauce
-    pygame.image.load("pizza_2.png"),  # dough + sauce + cheese
-    pygame.image.load("pizza_3.png")  # dough + sauce + cheese + veggies
+    pygame.image.load("cakedough.png"),  # dough only
+    pygame.image.load("cake_1.png"),  # dough + sauce
+    pygame.image.load("cake_2.png"),  # dough + sauce + cheese
+    pygame.image.load("cake_3.png")  # dough + sauce + cheese + veggies
 ]
 
 # За pizza_stages - големина 25% од висината и ширината за одржување на квалитетот
 pizza_size = (int(HEIGHT * 0.25), int(HEIGHT * 0.25))
 pizza_stages = [pygame.transform.scale(img, pizza_size) for img in pizza_stages]
-pizza_stages = [crop_surface_to_circle(img) for img in pizza_stages]
+#pizza_stages = [crop_surface_to_circle(img) for img in pizza_stages]
 
 # Load sounds
 success_sound = pygame.mixer.Sound("../sounds/correct.wav")
@@ -119,8 +123,8 @@ button_height = 50
 button_padding = 10
 
 restart_button_rect = pygame.Rect(WIDTH - button_width - 20, 20, button_width, button_height)
-next_button_rect = pygame.Rect(WIDTH - button_width - 20, 20 + button_height + button_padding, button_width,
-                               button_height)
+#next_button_rect = pygame.Rect(WIDTH - button_width - 20, 20 + button_height + button_padding, button_width,
+ #                              button_height)
 
 
 def draw_button(rect, text, color, font, screen):
@@ -153,7 +157,7 @@ def draw_screen():
     screen.blit(table_img, (0, 0))  # Background на цел екран
 
     # Title - позициониран горе центрирано
-    text = font.render("Ајде да направиме пица!", True, (0, 0, 0))
+    text = font.render("Ајде да направиме торта!", True, (0, 0, 0))
     screen.blit(text, (WIDTH // 2 - text.get_width() // 2, int(HEIGHT * 0.02)))
 
     # Draw brown squares
@@ -179,12 +183,12 @@ def draw_screen():
     draw_button(restart_button_rect, "Restart", LIGHT_BROWN, font, screen)
 
     # Show "Следно" button only when game is completed
-    if game_completed:
-        draw_button(next_button_rect, "Следно", BROWN, font, screen)
+    #if game_completed:
+     #   draw_button(next_button_rect, "Следно", BROWN, font, screen)
 
     # Show "Bravo!" message when game is completed
     if game_completed:
-        text = font.render("Браво! Ја направи пицата!", True, GREEN)
+        text = font.render("Браво! Ја направи тортата!", True, GREEN)
         screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 300))
 
     pygame.display.flip()
@@ -218,14 +222,7 @@ while running:
                 reset_game()
 
             # Проверка дали кликнал на Следно копче само ако играта е завршена
-            elif game_completed and next_button_rect.collidepoint(mouse_pos):
-                pygame.quit()
-                # Стартувај го level2.py (во иста папка)
-                try:
-                    subprocess.Popen([sys.executable, "level2.py"])
-                except Exception as e:
-                    print(f"Грешка при стартување на level2.py: {e}")
-                sys.exit()
+
 
             elif not game_completed:  # Дозволи drag само ако играта не е завршена
                 for ing in reversed(ingredients):

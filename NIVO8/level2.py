@@ -27,11 +27,11 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
 
 # После ова, скалирај ја сликата:
-background = pygame.image.load("../pictures/tabla.png").convert()
+background = pygame.image.load("../Pictures-Game8/tabla.png").convert()
 background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
 
 # Load the coloring image
-coloring_image_tmp = pygame.image.load("flower1.jpg")
+coloring_image_tmp = pygame.image.load("../Pictures-Game8/flower1.jpg")
 coloring_image = coloring_image_tmp.convert()
 
 clock = pygame.time.Clock()
@@ -39,7 +39,7 @@ font = pygame.font.SysFont("Arial", 30)
 button_font = pygame.font.SysFont("Arial", 24, bold=True)
 
 # Load reference image
-final_image = pygame.image.load("final.png").convert_alpha()
+final_image = pygame.image.load("../Pictures-Game8/final.png").convert_alpha()
 
 # Scale both images to the same size (using final image's dimensions)
 target_width = final_image.get_width()-100
@@ -85,7 +85,7 @@ selected_color = None
 selected_number = None
 
 # Load areas from JSON
-with open("areas.json", "r") as f:
+with open("../NIVO8/areas.json", "r") as f:
     areas = json.load(f)
 
 for a in areas:
@@ -207,85 +207,78 @@ def draw_button(x, y, width, height, text, color, hover_color):
     return pygame.Rect(x, y, width, height), is_hovered
 
 
-def main():
+def start_coloring_level():
     global selected_color, selected_number
 
     running = True
     finished = False
     draw_surface = pygame.Surface((bg_width, bg_height), pygame.SRCALPHA)
 
-    # For button hover effects
     prev_hovered_button = None
 
     while running:
-        # Draw background
         screen.blit(background, (0, 0))
 
-        # Draw decorative elements if available
         if decor_left:
             screen.blit(decor_left, (10, screen_height - 160))
         if decor_right:
             screen.blit(decor_right, (screen_width - 160, screen_height - 160))
 
-        # Coloring area with semi-transparent white background
         coloring_bg = pygame.Surface((bg_width + 20, bg_height + 20), pygame.SRCALPHA)
         coloring_bg.fill((255, 255, 255, 200))
         screen.blit(coloring_bg, (bg_x - 10, bg_y - 10))
 
-        # Coloring image
         screen.blit(coloring_image, (bg_x, bg_y))
         screen.blit(draw_surface, (bg_x, bg_y))
-
-        # Draw areas and numbers
         draw_areas()
-
-        # Color palette at top (now moved down by 30px)
         draw_palette()
 
-        # Reference image
         ref_bg = pygame.Surface((target_width + 20, target_height + 20), pygame.SRCALPHA)
         ref_bg.fill((255, 255, 255, 200))
         screen.blit(ref_bg, (final_x - 10, final_y - 10))
         screen.blit(final_image, (final_x, final_y))
 
-        # Draw buttons - moved restart button left from palette
         restart_btn, restart_hovered = draw_button(
-            palette_start_x +600,  # Positioned left of palette
-            palette_y + palette_radius -60,  # Same Y position as palette
+            palette_start_x + 600,
+            palette_y + palette_radius - 60,
             200, 50,
             "Рестарт",
             (0, 120, 255),
             (0, 150, 255)
         )
+        back_btn, back_hovered = draw_button(
+            screen_width // 2 + 260,
+            screen_height // 2 - 385,  # Помалку од 220
+            200, 50,
+            "Назад",
+            (200, 0, 0),
+            (230, 0, 0)
+        )
 
         next_btn, next_hovered = None, None
         if finished:
             next_btn, next_hovered = draw_button(
-                screen_width // 2 - 100,  # Centered on screen
-                screen_height // 2 + 150,  # Below congrats text
+                screen_width // 2 - 100,
+                screen_height // 2 + 150,
                 200, 50,
                 "Следна слика",
                 (0, 200, 0),
                 (0, 230, 0)
             )
 
-        # Play button hover sound if needed
-        current_hovered = restart_btn if restart_hovered else next_btn if next_hovered else None
+        current_hovered = restart_btn if restart_hovered else next_btn if next_hovered else back_btn if back_hovered else None
         if button_sound and current_hovered != prev_hovered_button:
             button_sound.play()
         prev_hovered_button = current_hovered
 
-        # Show congratulations if finished
         if finished:
             show_congrats_screen()
 
-        # Handle mouse events
         mouse_pressed = pygame.mouse.get_pressed()
         mx, my = pygame.mouse.get_pos()
         local_x = mx - bg_x
         local_y = my - bg_y
 
-        # Coloring logic
         if mouse_pressed[0] and not finished and selected_color:
             painted = False
             for a in areas:
@@ -310,55 +303,52 @@ def main():
                         pass
                 finished = True
 
-        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mx, my = event.pos
+
+                if restart_btn.collidepoint(mx, my):
+                    if button_click_sound:
+                        button_click_sound.play()
+                    for a in areas:
+                        a["color"] = None
+                        a["visited"] = False
+                    draw_surface.fill((0, 0, 0, 0))
+                    finished = False
+                    selected_color = None
+                    selected_number = None
+
+                if back_btn.collidepoint(mx, my):
+                    if button_click_sound:
+                        button_click_sound.play()
                     running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
-                    mx, my = event.pos
+                    from NIVO8.level1 import start_drawing_game
+                    start_drawing_game()
 
-                    # Check if clicked on restart button
-                    if restart_btn.collidepoint(mx, my):
-                        if button_click_sound:
-                            button_click_sound.play()
-                        for a in areas:
-                            a["color"] = None
-                            a["visited"] = False
-                        draw_surface.fill((0, 0, 0, 0))
-                        finished = False
-                        selected_color = None
-                        selected_number = None
 
-                    # Check if clicked on next button
-                    elif finished and next_btn and next_btn.collidepoint(mx, my):
-                        if button_click_sound:
-                            button_click_sound.play()
-                        pygame.quit()
-                        import subprocess
-                        subprocess.run([sys.executable, "level3.py"])
-                        sys.exit()
 
-                    # Check if clicked on color palette
-                    elif not finished:
-                        for num, pos in palette_pos.items():
-                            px, py = pos
-                            if (mx - px) ** 2 + (my - py) ** 2 <= palette_radius ** 2:
-                                if button_click_sound:
-                                    button_click_sound.play()
-                                selected_color = palette_colors[num]
-                                selected_number = num
-                                break
+
+                elif finished and next_btn and next_btn.collidepoint(mx, my):
+                    if button_click_sound:
+                        button_click_sound.play()
+                    # Instead of quitting, just break the loop to return control
+                    return "next"
+
+                elif not finished:
+                    for num, pos in palette_pos.items():
+                        px, py = pos
+                        if (mx - px) ** 2 + (my - py) ** 2 <= palette_radius ** 2:
+                            if button_click_sound:
+                                button_click_sound.play()
+                            selected_color = palette_colors[num]
+                            selected_number = num
+                            break
 
         pygame.display.flip()
         clock.tick(60)
 
-    pygame.quit()
-    sys.exit()
-
-
-if __name__ == "__main__":
-    main()
+    return "quit"

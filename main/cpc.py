@@ -3,9 +3,13 @@ import sys
 import random
 import math
 from NIVO1.level1 import start_motorika_game
+from NIVO2.game7 import start_spatial_game
 from NIVO3.level1 import start_kolicina_game
+from NIVO5.level1 import start_emotion_game
 from NIVO6.level1 import start_colorsAndshapes_game
+from NIVO7.level1 import start_social_skills_game
 from NIVO8.level1 import start_drawing_game
+from NIVO4.game4 import run_macedonian_game
 
 pygame.init()
 
@@ -393,12 +397,20 @@ def main():
                         active_window = i
                         if i == 0:
                             start_motorika_game()
+                        elif i == 1:
+                            start_spatial_game()
                         elif i == 2:
                             start_kolicina_game()
                         elif i == 5:
                              start_colorsAndshapes_game()
                         elif i==7:
                             start_drawing_game()
+                        elif i==6:
+                            start_social_skills_game()
+                        elif i == 4:
+                            start_emotion_game()
+                        elif i == 3:
+                            run_macedonian_game()
 
         if active_window is not None:
             if active_window == 4:  # Emotional interaction

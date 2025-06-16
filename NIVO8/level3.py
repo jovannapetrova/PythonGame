@@ -17,7 +17,7 @@ def level3(screen):
     background = pygame.image.load("../Pictures-Game8/tabla.png").convert()
     background = pygame.transform.smoothscale(background, (screen_width, screen_height))
 
-    coloring_image_tmp = pygame.image.load("../Pictures-Game8/house.png")
+    coloring_image_tmp = pygame.image.load("../Pictures-Game8/house1.png")
     coloring_image = coloring_image_tmp.convert()
 
     final_image = pygame.image.load("../Pictures-Game8/finalhouse.png").convert_alpha()

@@ -3,6 +3,7 @@ import random
 import sys
 from NIVO6.level2 import start_level2
 
+
 def start_colorsAndshapes_game():
     # Иницијализација
     pygame.init()
@@ -45,10 +46,25 @@ def start_colorsAndshapes_game():
     except:
         lion_image = None
 
-    confetti_image = pygame.image.load("../Pictures-Game6/bravo.png")
-    try_again_image = pygame.image.load("../Pictures-Game6/sad_face.png")
-    correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
-    wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
+    try:
+        confetti_image = pygame.image.load("../Pictures-Game6/bravo.png")
+    except:
+        confetti_image = None
+
+    try:
+        try_again_image = pygame.image.load("../Pictures-Game6/sad_face.png")
+    except:
+        try_again_image = None
+
+    try:
+        correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
+    except:
+        correct_sound = None
+
+    try:
+        wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
+    except:
+        wrong_sound = None
 
     # Фонтови
     font_big = pygame.font.SysFont("Arial", 60, bold=True)
@@ -98,6 +114,10 @@ def start_colorsAndshapes_game():
     showing_results = False
     selected_objects = []
 
+    # Global variables for challenge
+    challenge_text = ""
+    target_objects = []
+
     def lighten_color(color, amount=0.3):
         # Функција која ја осветлува бојата (color е RGB tuple), amount е колку да ја осветлиме (0-1)
         r = min(int(color[0] + (255 - color[0]) * amount), 255)
@@ -112,9 +132,6 @@ def start_colorsAndshapes_game():
                          border_radius=border_radius)
         # Base
         pygame.draw.rect(surface, base_color, rect, border_radius=border_radius)
-        # Highlight7
-        # pygame.draw.line(surface, highlight_color, (rect.x, rect.y), (rect.x + rect.width, rect.y), 3)
-        # pygame.draw.line(surface, highlight_color, (rect.x, rect.y), (rect.x, rect.y + rect.height), 3)
 
     def draw_button(surface, rect, text, font, base_color, highlight_color, shadow_color, is_active=False, icon=None):
         # Основно копче со border_radius
@@ -186,23 +203,23 @@ def start_colorsAndshapes_game():
         screen.blit(s, challenge_box)
 
         # Текстот останува ист
-        # font_medium.set_bold(True)
         text_surf = font_medium.render(challenge_text, True, COLOR_TEXT_DARK)
         screen.blit(text_surf, (challenge_box.centerx - text_surf.get_width() // 2,
                                 challenge_box.centery - text_surf.get_height() // 2))
 
         # Draw example shape above the challenge text
-        example_box = pygame.Rect(challenge_box.centerx - 240, challenge_box.top - 100, 500, 70)
-
-        s_example = pygame.Surface((example_box.width, example_box.height), pygame.SRCALPHA)
-        pygame.draw.rect(s_example, (*COLOR_TRANSPARENT_BOX[:3], 180), (0, 0, example_box.width, example_box.height),
-                         border_radius=8)
-        pygame.draw.rect(s_example, COLOR_BUTTON_HIGHLIGHT, (0, 0, example_box.width, example_box.height), 2,
-                         border_radius=8)
-        screen.blit(s_example, example_box)
-
-        # Draw the target shape in the example box
         if target_objects:
+            example_box = pygame.Rect(challenge_box.centerx - 240, challenge_box.top - 100, 500, 70)
+
+            s_example = pygame.Surface((example_box.width, example_box.height), pygame.SRCALPHA)
+            pygame.draw.rect(s_example, (*COLOR_TRANSPARENT_BOX[:3], 180),
+                             (0, 0, example_box.width, example_box.height),
+                             border_radius=8)
+            pygame.draw.rect(s_example, COLOR_BUTTON_HIGHLIGHT, (0, 0, example_box.width, example_box.height), 2,
+                             border_radius=8)
+            screen.blit(s_example, example_box)
+
+            # Draw the target shape in the example box
             color_name, shape_name, _ = target_objects[0]  # Take the first target
             example_rect = pygame.Rect(example_box.centerx - 25, example_box.centery - 25, 50, 50)
             draw_object(color_name, shape_name, example_rect)
@@ -217,12 +234,9 @@ def start_colorsAndshapes_game():
         # Намалена висина за објектите
         objects_area = pygame.Rect(x_pos, 220, box_width, height - 450)  # Помалку високо
 
-        s = pygame.Surface((objects_area.width, objects_area.height), pygame.SRCALPHA)
-        pygame.draw.rect(s, (*COLOR_TRANSPARENT_BOX[:3], 150), (0, 0, objects_area.width, objects_area.height),
-                         border_radius=12)
-        pygame.draw.rect(s, COLOR_BUTTON_HIGHLIGHT, (0, 0, objects_area.width, objects_area.height), 2,
-                         border_radius=12)
-        screen.blit(s, objects_area)
+        # Draw the background for objects area
+        pygame.draw.rect(screen, (230, 220, 205), objects_area, border_radius=12)
+        pygame.draw.rect(screen, COLOR_BUTTON_HIGHLIGHT, objects_area, width=2, border_radius=12)
 
         # Панда декорациите се прилагодени
         if panda_image1:
@@ -288,16 +302,15 @@ def start_colorsAndshapes_game():
             "medium": medium_btn,
             "hard": hard_btn,
             "next": next_btn,
-            "back":back_btn,
-
+            "back": back_btn,
         }
 
     def bojaformalevel2():
-
         start_level2()
-        # Предизвик
+
+    # Предизвик
     def new_challenge():
-        global challenge_text, target_objects
+        nonlocal challenge_text, target_objects
         selected_objects.clear()
         if current_level == "лесно":
             color = random.choice(list(colors.keys()))
@@ -326,14 +339,26 @@ def start_colorsAndshapes_game():
     # Објекти
     objects = []
 
+    def check_overlap(new_rect, existing_objects, min_distance=80):
+        """Check if new rectangle overlaps with existing objects"""
+        for _, _, existing_rect in existing_objects:
+            # Calculate distance between centers
+            dx = new_rect.centerx - existing_rect.centerx
+            dy = new_rect.centery - existing_rect.centery
+            distance = (dx * dx + dy * dy) ** 0.5
+            if distance < min_distance:
+                return True
+        return False
+
     def generate_objects():
-        global objects
+        nonlocal objects
         objects = []
         width, height = screen.get_size()
 
         # Get the objects area rectangle
-        objects_area = pygame.Rect((width - int((width - 200) * 0.7)) // 2, 220,
-                                   int((width - 200) * 0.7), height - 450)
+        box_width = int((width - 200) * 0.7)
+        x_pos = (width - box_width) // 2
+        objects_area = pygame.Rect(x_pos, 220, box_width, height - 450)
 
         # Calculate safe area (smaller than objects_area to keep shapes fully visible)
         safe_area = objects_area.inflate(-80, -80)
@@ -341,35 +366,72 @@ def start_colorsAndshapes_game():
         # Target objects
         for color, shape, count in target_objects:
             for _ in range(count):
-                # Generate position within safe area
+                # Try to find a non-overlapping position
+                attempts = 0
+                max_attempts = 50
+                while attempts < max_attempts:
+                    x = random.randint(safe_area.left, safe_area.right - 60)
+                    y = random.randint(safe_area.top, safe_area.bottom - 60)
+                    new_rect = pygame.Rect(x, y, 60, 60)
+
+                    if not check_overlap(new_rect, objects):
+                        objects.append((color, shape, new_rect))
+                        break
+                    attempts += 1
+
+                # If we couldn't find a non-overlapping position, place it anyway
+                if attempts >= max_attempts:
+                    x = random.randint(safe_area.left, safe_area.right - 60)
+                    y = random.randint(safe_area.top, safe_area.bottom - 60)
+                    objects.append((color, shape, pygame.Rect(x, y, 60, 60)))
+
+        # Additional random objects
+        num_to_add = max(0, 12 - len(objects))  # Reduced from 15 to 12 to have less crowding
+        for _ in range(num_to_add):
+            color = random.choice(list(colors.keys()))
+            shape = random.choice(shapes)
+
+            # Try to find a non-overlapping position
+            attempts = 0
+            max_attempts = 50
+            while attempts < max_attempts:
+                x = random.randint(safe_area.left, safe_area.right - 60)
+                y = random.randint(safe_area.top, safe_area.bottom - 60)
+                new_rect = pygame.Rect(x, y, 60, 60)
+
+                if not check_overlap(new_rect, objects):
+                    objects.append((color, shape, new_rect))
+                    break
+                attempts += 1
+
+            # If we couldn't find a non-overlapping position, place it anyway
+            if attempts >= max_attempts:
                 x = random.randint(safe_area.left, safe_area.right - 60)
                 y = random.randint(safe_area.top, safe_area.bottom - 60)
                 objects.append((color, shape, pygame.Rect(x, y, 60, 60)))
 
-        # Additional random objects
-        num_to_add = 10 - len(objects)
-        for _ in range(num_to_add):
-            color = random.choice(list(colors.keys()))
-            shape = random.choice(shapes)
-            x = random.randint(safe_area.left, safe_area.right - 60)
-            y = random.randint(safe_area.top, safe_area.bottom - 60)
-            objects.append((color, shape, pygame.Rect(x, y, 60, 60)))
-
+        print(f"Generated {len(objects)} objects")
         random.shuffle(objects)
 
     def draw_object(color_name, shape, rect, selected=False):
         color = colors[color_name]
+
+        # Draw selection highlight first (behind the shape)
         if selected:
-            pygame.draw.rect(screen, COLOR_TEXT_DARK, rect.inflate(10, 10), 4, border_radius=8)
+            highlight_rect = rect.inflate(12, 12)
+            pygame.draw.rect(screen, (255, 255, 0), highlight_rect, 6, border_radius=12)  # Yellow highlight
 
         if shape == "круг":
             pygame.draw.circle(screen, color, rect.center, 30)
+            pygame.draw.circle(screen, (0, 0, 0), rect.center, 30, 3)  # Thicker border
         elif shape == "квадрат":
             pygame.draw.rect(screen, color, rect, border_radius=8)
+            pygame.draw.rect(screen, (0, 0, 0), rect, 3, border_radius=8)  # Thicker border
         elif shape == "правоаголник":
             # Adjust rectangle dimensions to fit better
             rect_adjusted = pygame.Rect(rect.x, rect.y + 10, 80, 40)
             pygame.draw.rect(screen, color, rect_adjusted, border_radius=8)
+            pygame.draw.rect(screen, (0, 0, 0), rect_adjusted, 3, border_radius=8)  # Thicker border
         elif shape == "триаголник":
             points = [
                 (rect.centerx, rect.top + 5),
@@ -377,14 +439,16 @@ def start_colorsAndshapes_game():
                 (rect.right - 5, rect.bottom - 5)
             ]
             pygame.draw.polygon(screen, color, points)
+            pygame.draw.polygon(screen, (0, 0, 0), points, 3)  # Thicker border
 
     def show_feedback(correct):
         screen_width, screen_height = screen.get_size()
 
         if correct:
-            # Прикажи конфети позадина
-            scaled_confetti = pygame.transform.scale(confetti_image, (screen_width, screen_height))
-            screen.blit(scaled_confetti, (0, 0))
+            if confetti_image:
+                # Прикажи конфети позадина
+                scaled_confetti = pygame.transform.scale(confetti_image, (screen_width, screen_height))
+                screen.blit(scaled_confetti, (0, 0))
 
             # Прикажи текст "БРАВО"
             bravo_text = font_big.render("БРАВО!", True, (0, 100, 0))  # зелена боја
@@ -393,10 +457,12 @@ def start_colorsAndshapes_game():
                 screen_height // 2 - bravo_text.get_height() // 2
             ))
 
-            correct_sound.play()
+            if correct_sound:
+                correct_sound.play()
         else:
-            scaled_try_again = pygame.transform.scale(try_again_image, (screen_width, screen_height))
-            screen.blit(scaled_try_again, (0, 0))
+            if try_again_image:
+                scaled_try_again = pygame.transform.scale(try_again_image, (screen_width, screen_height))
+                screen.blit(scaled_try_again, (0, 0))
 
             try_again_text = font_big.render("ОБИДИ СЕ ПОВТОРНО!", True, (200, 0, 0))  # црвена боја
 
@@ -406,7 +472,8 @@ def start_colorsAndshapes_game():
                 60
             ))
 
-            wrong_sound.play()
+            if wrong_sound:
+                wrong_sound.play()
 
         pygame.display.flip()
         pygame.time.delay(2000)
@@ -417,6 +484,8 @@ def start_colorsAndshapes_game():
 
     # Главна јамка
     running = True
+    back_btn_rect = None
+
     while running:
         width, height = screen.get_size()
 
@@ -447,10 +516,19 @@ def start_colorsAndshapes_game():
             objects_area = draw_objects_area()  # Get the objects area rectangle
             buttons = draw_bottom_buttons()
 
-            # Draw game objects
-            for color, shape, rect in objects:
-                is_selected = (color, shape, rect) in selected_objects
-                draw_object(color, shape, rect, is_selected)
+            # Draw game objects (draw selected objects last so they appear on top)
+            unselected_objects = [(color, shape, rect) for color, shape, rect in objects
+                                  if (color, shape, rect) not in selected_objects]
+            selected_object_list = [(color, shape, rect) for color, shape, rect in objects
+                                    if (color, shape, rect) in selected_objects]
+
+            # Draw unselected objects first
+            for color, shape, rect in unselected_objects:
+                draw_object(color, shape, rect, False)
+
+            # Draw selected objects last (on top)
+            for color, shape, rect in selected_object_list:
+                draw_object(color, shape, rect, True)
 
         # Event handling
         for event in pygame.event.get():
@@ -463,7 +541,7 @@ def start_colorsAndshapes_game():
                 pos = event.pos
 
                 if showing_results:
-                    if back_btn_rect.collidepoint(pos):
+                    if back_btn_rect and back_btn_rect.collidepoint(pos):
                         showing_results = False
                 else:
                     # Check level buttons
@@ -471,6 +549,8 @@ def start_colorsAndshapes_game():
                         current_level = "лесно"
                         new_challenge()
                         generate_objects()
+                        print("Target objects:", target_objects)
+                        print("Objects", objects)
                     elif buttons["medium"].collidepoint(pos):
                         current_level = "средно"
                         new_challenge()
@@ -483,7 +563,6 @@ def start_colorsAndshapes_game():
                     elif buttons["results"].collidepoint(pos):
                         showing_results = True
                     elif buttons["new_player"].collidepoint(pos):
-                        # global current_player, players
                         new_index = len(players) + 1
                         new_player_name = f"Играч {new_index}"
                         players[new_player_name] = 0  # Додај го новиот играч со поени 0
@@ -493,17 +572,28 @@ def start_colorsAndshapes_game():
                         bojaformalevel2()
                     elif buttons["back"].collidepoint(pos):
                         # Овде повикај ја функцијата која треба да ја стартува следната игра / ниво
-                        from main.cpc import main
-                        main()
+                        try:
+                            from main.cpc import main
+                            main()
+                        except:
+                            print("Could not import main.cpc")
                     else:
                         # Check object selection (only within objects area)
                         if objects_area.collidepoint(pos):
-                            for color, shape, rect in objects:
+                            # Find the topmost object at the click position
+                            clicked_object = None
+                            # Iterate through objects in reverse order (last drawn = topmost)
+                            for color, shape, rect in reversed(objects):
                                 if rect.collidepoint(pos):
-                                    if (color, shape, rect) in selected_objects:
-                                        selected_objects.remove((color, shape, rect))
-                                    else:
-                                        selected_objects.append((color, shape, rect))
+                                    clicked_object = (color, shape, rect)
+                                    break
+
+                            # If we found an object, toggle its selection
+                            if clicked_object:
+                                if clicked_object in selected_objects:
+                                    selected_objects.remove(clicked_object)
+                                else:
+                                    selected_objects.append(clicked_object)
 
                             # Check if selection matches target
                             if len(selected_objects) == sum(count for _, _, count in target_objects):
@@ -517,7 +607,6 @@ def start_colorsAndshapes_game():
 
                                 if correct:
                                     players[current_player] += 1
-
                                     show_feedback(True)
                                     new_challenge()
                                     generate_objects()
@@ -528,3 +617,4 @@ def start_colorsAndshapes_game():
         pygame.display.flip()
         clock.tick(30)
 
+    pygame.quit()

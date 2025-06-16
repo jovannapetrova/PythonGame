@@ -15,7 +15,7 @@ def start_level2():
     # Screen setup
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     WIDTH, HEIGHT = screen.get_size()
-    pygame.display.set_caption("🎭 Препознај ја емоцијата - Ниво 2")
+    pygame.display.set_caption(" Препознај ја емоцијата - Ниво 2")
 
     # Colors
     colors = {
@@ -164,12 +164,12 @@ def start_level2():
 
         if selected_emotion == current_correct_answer:
             score += 1
-            feedback_text = "🎉 Точно!"
+            feedback_text = " Точно!"
             feedback_color = colors['success']
             if correct_sound:
                 correct_sound.play()
         else:
-            feedback_text = f"❌ Неточно! Точен одговор: {current_correct_answer}"
+            feedback_text = f" Неточно! Точен одговор: {current_correct_answer}"
             feedback_color = colors['error']
             if wrong_sound:
                 wrong_sound.play()
@@ -201,7 +201,7 @@ def start_level2():
         screen.fill(colors['primary'])
 
         # Draw title
-        title_text = title_font.render("🎭 ПРЕПОЗНАЈ ЈА ЕМОЦИЈАТА - Ниво 2", True, colors['cyan'])
+        title_text = title_font.render(" ПРЕПОЗНАЈ ЈА ЕМОЦИЈАТА - Ниво 2", True, colors['cyan'])
         title_rect = title_text.get_rect(centerx=WIDTH // 2, y=30)
         screen.blit(title_text, title_rect)
 
@@ -265,13 +265,13 @@ def start_level2():
             percent = (score / QUESTION_COUNT) * 100
 
             if percent >= 80:
-                message = "🏆 ОДЛИЧНО!"
+                message = " ОДЛИЧНО!"
                 message_color = colors['success']
             elif percent >= 60:
-                message = "👏 ДОБРО!"
+                message = " ДОБРО!"
                 message_color = (243, 156, 18)  # Orange
             else:
-                message = "🙁 ВЕЖБАЈ ПОВЕЌЕ!"
+                message = " ВЕЖБАЈ ПОВЕЌЕ!"
                 message_color = colors['error']
 
             # Draw final message
@@ -289,7 +289,7 @@ def start_level2():
 
             # Draw restart button
             restart_button_rect = pygame.Rect(WIDTH // 2 - 150, 450, 300, 60)
-            draw_button(screen, restart_button_rect, "🔄 ИГРАЈ ПОВТОРНО", button_font, colors['accent'], colors['text'],
+            draw_button(screen, restart_button_rect, " ИГРАЈ ПОВТОРНО", button_font, colors['accent'], colors['text'],
                         colors['cyan'])
 
             # Store restart button rect
@@ -297,7 +297,7 @@ def start_level2():
 
         # Draw back button
         back_button_rect = pygame.Rect(50, HEIGHT - 80, 150, 50)
-        draw_button(screen, back_button_rect, "← Назад", button_font, colors['secondary'], colors['text'],
+        draw_button(screen, back_button_rect, "Назад", button_font, colors['secondary'], colors['text'],
                     colors['cyan'])
         draw_game_screen.back_button_rect = back_button_rect
 

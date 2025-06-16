@@ -1,6 +1,7 @@
 import pygame
 import random
 
+
 def start_kolicina_level2():
     pygame.init()
 
@@ -59,21 +60,21 @@ def start_kolicina_level2():
         points = [(x, y - size), (x - size, y + size), (x + size, y + size)]
         pygame.draw.polygon(screen, SHAPE_COLORS['триаголници'], points)
 
-    def show_feedback(is_correct):
+    def show_feedback(is_correct, correct_ans):
         if is_correct:
             correct_sound.play()
             img = confetti_img
             text = "                 Браво! Точен одговор!"
             color = GREEN
-            bg_color = WHITE  # Боја за цел екран кога е точен одговор
+            bg_color = WHITE
         else:
             wrong_sound.play()
             img = sad_face_img
-            text = f"Погрешно! Точен одговор: {correct_answer}"
+            text = f"Погрешно! Точен одговор: {correct_ans}"
             color = RED
-            bg_color = WHITE  # Боја за цел екран кога е погрешен одговор
+            bg_color = WHITE
 
-        screen.fill(bg_color)  # Пополнуваме го целиот екран со боја
+        screen.fill(bg_color)
         txt_surf = BIG_FONT.render(text, True, color)
         screen.blit(txt_surf, (WIDTH // 2 - txt_surf.get_width() // 2, 100))
         img_rect = img.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
@@ -136,10 +137,8 @@ def start_kolicina_level2():
         shape_size_small = 20
         center_y = y + h // 2
 
-        # Почнуваме од десната страна на облакот
-        start_x = x + w - 30  # 30 пиксели маргина од десната страна
+        start_x = x + w - 30
 
-        # Цртаме од десно кон лево
         for i, shape in enumerate(cloud):
             pos_x = start_x - i * shape_spacing
             draw_shape_with_size(shape, pos_x, center_y, shape_size_small)
@@ -200,22 +199,25 @@ def start_kolicina_level2():
     show_results_btn = pygame.Rect(30, HEIGHT - 100, 200, 50)
     new_player_btn = pygame.Rect(250, HEIGHT - 100, 200, 50)
     back_level_btn = pygame.Rect(250, HEIGHT - 100, 200, 50)
+
+    # Initialize game variables
     question_text, clouds, shape, operator, correct_answer = generate_question(level)
     options = generate_options(correct_answer)
     selected = None
     result = None
     show_results = False
 
-    def reset_game(selected_level):
-        global level, question_text, clouds, shape, operator, correct_answer, options, selected, result, show_results
-        level = level_names.index(selected_level) + 1
+    def generate_new_question():
+        nonlocal question_text, clouds, shape, operator, correct_answer, options, selected, result
         question_text, clouds, shape, operator, correct_answer = generate_question(level)
         options = generate_options(correct_answer)
         selected = None
         result = None
-        show_results = False
 
-    reset_game("Лесно")
+    def reset_game_for_level(new_level):
+        nonlocal level
+        level = new_level
+        generate_new_question()
 
     clock = pygame.time.Clock()
     running = True
@@ -244,7 +246,7 @@ def start_kolicina_level2():
                     if new_player_btn.collidepoint(event.pos):
                         add_new_player()
                         current_player_index = len(players) - 1
-                        reset_game(level_names[level - 1])
+                        generate_new_question()
                     elif show_results_btn.collidepoint(event.pos):
                         show_results = False
             clock.tick(30)
@@ -266,9 +268,7 @@ def start_kolicina_level2():
         if len(clouds) == 2:
             draw_operator(start_x + cloud_w + space // 2 - 10, HEIGHT // 2 - 30, operator)
         elif len(clouds) == 3:
-            # Цртај оператор помеѓу првиот и вториот облак
             draw_operator(start_x + cloud_w + space // 2 - 10, HEIGHT // 2 - 30, operator)
-            # За едноставност, кај 3 облаци ќе го повториме операторот меѓу вториот и третиот облак
             draw_operator(start_x + 2 * (cloud_w + space) - 30, HEIGHT // 2 - 30, operator)
 
         # Draw numeric options
@@ -284,10 +284,11 @@ def start_kolicina_level2():
             screen.blit(txt_surf, (rect.x + (rect.width - txt_surf.get_width()) // 2,
                                    rect.y + (rect.height - txt_surf.get_height()) // 2))
 
-        # Draw buttons: Нов играч и Прикажи резултати
+        # Draw buttons
         draw_button("Нов играч", new_player_btn)
         draw_button("Прикажи резултати", show_results_btn)
         draw_button("Претходен левел", back_level_btn)
+
         # Draw level buttons bottom right
         for i, rect in enumerate(level_buttons):
             is_active = (level == i + 1)
@@ -310,29 +311,33 @@ def start_kolicina_level2():
                         selected = opt
                         if selected == correct_answer:
                             current_player['points'] += 1
-                            show_feedback(True)
+                            show_feedback(True, correct_answer)
                         else:
-                            show_feedback(False)
-                        reset_game(level_names[level - 1])
+                            show_feedback(False, correct_answer)
+                        # Generate new question after feedback
+                        generate_new_question()
                         break
 
                 # Check new player button
                 if new_player_btn.collidepoint(mx, my):
                     add_new_player()
                     current_player_index = len(players) - 1
-                    reset_game(level_names[level - 1])
+                    generate_new_question()
+
+                # Check back level button
                 if back_level_btn.collidepoint(mx, my):
                     running = False
                     from NIVO3.level1 import start_kolicina_game
                     start_kolicina_game()
+
                 # Check show results button
                 if show_results_btn.collidepoint(mx, my):
                     show_results = True
 
-                # Check level buttons
+                # Check level buttons - FIXED
                 for i, rect in enumerate(level_buttons):
                     if rect.collidepoint(mx, my):
-                        reset_game(level_names[i])
+                        reset_game_for_level(i + 1)  # Level is 1-indexed
                         current_player_index = 0
                         break
 

@@ -17,7 +17,7 @@ def start_emotion_game():
     # Screen setup
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     WIDTH, HEIGHT = screen.get_size()
-    pygame.display.set_caption("🎭 Препознај ја емоцијата - Advanced Edition")
+    pygame.display.set_caption(" Препознај ја емоцијата - Advanced Edition")
 
     # Colors
     colors = {
@@ -239,11 +239,11 @@ def start_emotion_game():
 
         if selected_emotion == current_correct_answer:
             score += 1
-            feedback_text = "🎉 ОДЛИЧНО!"
+            feedback_text = " ОДЛИЧНО!"
             feedback_color = colors['success']
             create_confetti()
         else:
-            feedback_text = "❌ ОБИДИ СЕ ПОВТОРНО!"
+            feedback_text = " ОБИДИ СЕ ПОВТОРНО!"
             feedback_color = colors['error']
 
         show_feedback = True
@@ -257,13 +257,13 @@ def start_emotion_game():
 
         # Determine message and color
         if percentage >= 80:
-            message = "🏆 ФАНТАСТИЧНО!"
+            message = " ФАНТАСТИЧНО!"
             color = colors['success']
         elif percentage >= 60:
-            message = "👏 ДОБРО!"
+            message = " ДОБРО!"
             color = colors['warning']
         else:
-            message = "💪 ОБИДИ СЕ ПОВТОРНО!"
+            message = " ОБИДИ СЕ ПОВТОРНО!"
             color = colors['error']
 
         # Draw message
@@ -288,7 +288,7 @@ def start_emotion_game():
         restart_rect = pygame.Rect((WIDTH - button_width) // 2, y_offset + 40, button_width, button_height)
         draw_rounded_rect(screen, restart_rect, colors['accent'], 15)
 
-        restart_text = button_font.render("🔄 ИГРАЈ ПОВТОРНО", True, colors['text'])
+        restart_text = button_font.render(" ИГРАЈ ПОВТОРНО", True, colors['text'])
         restart_text_rect = restart_text.get_rect()
         restart_text_rect.center = restart_rect.center
         screen.blit(restart_text, restart_text_rect)
@@ -297,7 +297,7 @@ def start_emotion_game():
         next_rect = pygame.Rect((WIDTH - button_width) // 2, restart_rect.bottom + 20, button_width, button_height)
         draw_rounded_rect(screen, next_rect, colors['success'], 15)
 
-        next_text = button_font.render("➡️ Следен Левел", True, colors['text'])
+        next_text = button_font.render("️ Следен Левел", True, colors['text'])
         next_text_rect = next_text.get_rect()
         next_text_rect.center = next_rect.center
         screen.blit(next_text, next_text_rect)
@@ -427,7 +427,7 @@ def start_emotion_game():
             screen.blit(back_text, back_text_rect)
 
             # Draw title
-            title_text = title_font.render("🎭 ПРЕПОЗНАЈ ЈА ЕМОЦИЈАТА", True, colors['glow'])
+            title_text = title_font.render(" ПРЕПОЗНАЈ ЈА ЕМОЦИЈАТА", True, colors['glow'])
             title_rect = title_text.get_rect()
             title_rect.centerx = WIDTH // 2
             title_rect.y = 30

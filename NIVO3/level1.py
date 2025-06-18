@@ -8,11 +8,10 @@ def start_kolicina_game():
     WIDTH, HEIGHT = info.current_w, info.current_h
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption("Количина - Броење форми")
-    # Вчитување и ресајз на background сликата
     confetti_img = pygame.image.load("../Pictures-Game3/confetti.png")
     sad_face_img = pygame.image.load("../Pictures-Game3/sad_face.png")
-    character_img = pygame.image.load("../Pictures-Game3/person.png")  # Load character image
-    character_img = pygame.transform.scale(character_img, (200, 200))  # Resize character
+    character_img = pygame.image.load("../Pictures-Game3/person.png")
+    character_img = pygame.transform.scale(character_img, (200, 200))
     correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
     wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
 
@@ -23,8 +22,8 @@ def start_kolicina_game():
     background_img = pygame.image.load("../Pictures-Game3/bk.png").convert()
     background_img = pygame.transform.smoothscale(background_img, (WIDTH, HEIGHT))
 
-    panda_img = pygame.image.load("../Pictures-Game3/panda.png")  # Заменете го со вистинскиот пат
-    panda_img = pygame.transform.scale(panda_img, (50, 50))  # Големина на пандата
+    panda_img = pygame.image.load("../Pictures-Game3/panda.png")
+    panda_img = pygame.transform.scale(panda_img, (50, 50))
     FONT = pygame.font.SysFont("Arial", 48)
     SMALL_FONT = pygame.font.SysFont("Arial", 30)
     BUTTON_FONT = pygame.font.SysFont("Arial", 28)
@@ -33,14 +32,13 @@ def start_kolicina_game():
     RED = (220, 50, 50)
     GREEN = (50, 180, 50)
     BLUE = (50, 50, 220)
-    GRAY = (220, 220, 220, 150)  # Now with transparency (alpha)
+    GRAY = (220, 220, 220, 150)
     DARK_GRAY = (120, 120, 120)
 
     clock = pygame.time.Clock()
 
     all_shapes = ["circle", "square", "triangle"]
 
-    # Define the central rectangle for easy level
     EASY_AREA_WIDTH = WIDTH // 20
     EASY_AREA_HEIGHT = HEIGHT // 2 - 50
     EASY_AREA_X = (WIDTH - EASY_AREA_WIDTH) // 2
@@ -82,17 +80,15 @@ def start_kolicina_game():
 
     def generate_shapes_hard():
         target_shape = random.choice(all_shapes)
-        target_count = random.randint(8, 12)  # Повеќе таргет форми за тешко ниво
-        distractor_count = random.randint(6, 10)  # И повеќе дистрактори
+        target_count = random.randint(8, 12)
+        distractor_count = random.randint(6, 10)
         shapes = []
 
-        # Генерирај ги таргет формите на случајни позиции
         for _ in range(target_count):
             x = random.randint(80, WIDTH - 80)
             y = random.randint(150, HEIGHT - 150)
             shapes.append((target_shape, x, y))
 
-        # Генерирај дистрактор форми (различен тип)
         for _ in range(distractor_count):
             shape_type = random.choice([s for s in all_shapes if s != target_shape])
             x = random.randint(80, WIDTH - 80)
@@ -100,7 +96,7 @@ def start_kolicina_game():
             shapes.append((shape_type, x, y))
 
         random.shuffle(shapes)
-        bg_elements = []  # Празно, нема карактери
+        bg_elements = []
         return shapes, target_shape, target_count, bg_elements
 
     def draw_shape(shape, size=60):
@@ -150,9 +146,8 @@ def start_kolicina_game():
     result = None
     bg_elements = []  # For hard level background elements
 
-    # UI позиции
-    LEFT_BUTTON_Y = HEIGHT - 80  # Moved up to make room for taller buttons
-    LEVEL_BUTTON_Y = HEIGHT - 80  # Moved up to make room for taller buttons
+    LEFT_BUTTON_Y = HEIGHT - 80
+    LEVEL_BUTTON_Y = HEIGHT - 80
     LEVEL_BUTTON_X_START = WIDTH - 660
     LEVEL_BUTTON_WIDTH = 200
     LEVEL_BUTTON_HEIGHT = 70  # Taller buttons
@@ -188,7 +183,6 @@ def start_kolicina_game():
 
         screen.blit(background_img, (0, 0))
 
-        # Draw character in top right with 15px margin
         screen.blit(character_img, (WIDTH - character_img.get_width() - 15, 5))
 
         # Draw the central rectangle for easy level
@@ -200,33 +194,32 @@ def start_kolicina_game():
             for elem_x, elem_y in bg_elements:
                 screen.blit(character_img, (elem_x, elem_y))
 
-        # Цртаме форми
         for shape in shapes:
             draw_shape(shape)
 
         # Димензии на правоаголникот за прашањето
-        question_rect_width = 500  # Ширина
-        question_rect_height = 80  # Висина
-        question_rect_x = WIDTH // 2 - question_rect_width // 2  # Центрирано
-        question_rect_y = 30  # Од горниот раб
+        question_rect_width = 500
+        question_rect_height = 80
+        question_rect_x = WIDTH // 2 - question_rect_width // 2
+        question_rect_y = 30
 
         # Нацртај провиден правоаголник (RGBA за провидност)
         question_surface = pygame.Surface((question_rect_width, question_rect_height), pygame.SRCALPHA)
-        question_surface.fill((220, 220, 220, 180))  # Сиво со провидност
+        question_surface.fill((220, 220, 220, 180))
         screen.blit(question_surface, (question_rect_x, question_rect_y - 20))
 
         # Текст "Колку" (почетокот е во правоаголникот, но поместен десно)
         question_text1 = FONT.render("Колку", True, BLACK)
         screen.blit(
             question_text1,
-            (question_rect_x + 70,  # Поместено десно за да не се преклопува со пандата
+            (question_rect_x + 70,
              question_rect_y + question_rect_height // 2 - question_text1.get_height() // 2 - 20)
         )
 
         # Икона на формата што се бара
         draw_shape_icon(
             target_shape,
-            question_rect_x + 70 + question_text1.get_width() + 15,  # Поместено уште десно
+            question_rect_x + 70 + question_text1.get_width() + 15,
             question_rect_y + question_rect_height // 2 - 50,
             size=60
         )
@@ -235,7 +228,7 @@ def start_kolicina_game():
         question_text2 = FONT.render("ИМА?", True, BLACK)
         screen.blit(
             question_text2,
-            (question_rect_x + 70 + question_text1.get_width() + 15 + 60 + 10,  # Поместено уште десно
+            (question_rect_x + 70 + question_text1.get_width() + 15 + 60 + 10,
              question_rect_y + question_rect_height // 2 - question_text2.get_height() // 2 - 20)
         )
 
@@ -248,9 +241,9 @@ def start_kolicina_game():
         # Опции за одговор долу, во средина
         option_rects = []
         option_count = len(options)
-        total_width = option_count * 150  # ширина по број (150 пкс на број, можеш да ја промениш)
+        total_width = option_count * 150
         start_x = (
-                              WIDTH - total_width) // 2 + 75  # почетна точка, +75 за половина од ширината на еден број (за центрирање)
+                              WIDTH - total_width) // 2 + 75
 
         for i, val in enumerate(options):
             if selected is not None:
@@ -264,7 +257,7 @@ def start_kolicina_game():
                 color = BLACK
 
             txt = pygame.font.SysFont("Arial", 48).render(str(val), True, color)  # Arial, 48pt, обичен
-            rect = txt.get_rect(center=(start_x + i * 150, HEIGHT - 140))  # позиција во средина хоризонтално
+            rect = txt.get_rect(center=(start_x + i * 150, HEIGHT - 140))
             screen.blit(txt, rect)
             option_rects.append((rect, i))
 

@@ -170,8 +170,44 @@ def start_social_skills_game():
     game_state = "level1"  # "level1", "level2", "game_over"
     waiting_for_next = False
 
+    confetti_particles = []
+    CONFETTI_COLORS = [(255, 107, 107), (78, 205, 196), (69, 183, 209),
+                       (243, 156, 18), (231, 76, 60), (155, 89, 182)]
+
+    def create_confetti(x, y, count=30):
+
+        for _ in range(count):
+            confetti_particles.append({
+                'x': x,
+                'y': y,
+                'size': random.randint(5, 10),
+                'color': random.choice(CONFETTI_COLORS),
+                'dx': random.uniform(-3, 3),
+                'dy': random.uniform(-5, -1),
+                'life': random.randint(40, 60)
+            })
+
+    def update_confetti():
+
+        for p in confetti_particles[:]:
+            p['x'] += p['dx']
+            p['y'] += p['dy']
+            p['dy'] += 0.1  # Gravity
+            p['life'] -= 1
+
+            if p['life'] <= 0:
+                confetti_particles.remove(p)
+
+    def draw_confetti(surface):
+
+        for p in confetti_particles:
+            alpha = min(255, p['life'] * 5)  # Fade out
+            s = pygame.Surface((p['size'], p['size']), pygame.SRCALPHA)
+            s.fill((*p['color'], alpha))
+            surface.blit(s, (p['x'], p['y']))
+
     def wrap_text(text, font, max_width):
-        """Дели текст во повеќе линии ако е предолг"""
+
         words = text.split(' ')
         lines = []
         current_line = ""
@@ -195,7 +231,6 @@ def start_social_skills_game():
         pygame.draw.rect(surface, border_color, rect, border_radius=15, width=3)
         pygame.draw.rect(surface, color, rect.inflate(-6, -6), border_radius=12)
 
-        # Завиткува текст ако е предолг
         lines = wrap_text(text, font, rect.width - 20)
         total_height = len(lines) * font.get_height()
         start_y = rect.centery - total_height // 2
@@ -207,7 +242,7 @@ def start_social_skills_game():
             surface.blit(text_surf, (text_x, text_y))
 
     def draw_text_centered(surface, text, font, color, y, max_width=None):
-        """Црта центриран текст со можност за завиткување"""
+
         if max_width:
             lines = wrap_text(text, font, max_width)
             total_height = len(lines) * font.get_height()
@@ -232,9 +267,15 @@ def start_social_skills_game():
         if is_correct is True:
             feedback_color = CORRECT_COLOR
             feedback_bg = FEEDBACK_BG_CORRECT
+            # Create confetti at center screen
+            create_confetti(WIDTH // 2, HEIGHT // 2)
+            if correct_sound:
+                correct_sound.play()
         elif is_correct is False:
             feedback_color = WRONG_COLOR
             feedback_bg = FEEDBACK_BG_WRONG
+            if wrong_sound:
+                wrong_sound.play()
         else:
             feedback_color = FEEDBACK_COLOR
             feedback_bg = (232, 244, 253)  # Светло сина
@@ -242,19 +283,15 @@ def start_social_skills_game():
     def draw_level1():
         nonlocal waiting_for_next
 
-        # Заглавие
         draw_text_centered(screen, "Ниво 1: Основни социјални вештини", title_font, TEXT_COLOR, HEIGHT * 0.1)
 
-        # Емоџи икона
         emoji_font = pygame.font.SysFont("Arial", 80)
-        draw_text_centered(screen, "❓", emoji_font, TEXT_COLOR, HEIGHT * 0.2)
+        draw_text_centered(screen, "", emoji_font, TEXT_COLOR, HEIGHT * 0.2)
 
-        # Прашање
         if current_question < len(level1_questions):
             question = level1_questions[current_question]
             draw_text_centered(screen, question["question"], question_font, TEXT_COLOR, HEIGHT * 0.35, WIDTH * 0.8)
 
-            # Опции копчиња
             button_width = WIDTH * 0.6
             button_height = HEIGHT * 0.08
             start_y = HEIGHT * 0.5
@@ -270,7 +307,7 @@ def start_social_skills_game():
                 if not waiting_for_next:
                     draw_button(screen, button_rect, BUTTON_COLOR, TEXT_COLOR, option, button_font)
                 else:
-                    # Прикажи различни бои за точен/неточен одговор
+
                     if i == question["correct"]:
                         draw_button(screen, button_rect, FEEDBACK_BG_CORRECT, CORRECT_COLOR, option, button_font,
                                     CORRECT_COLOR)
@@ -278,24 +315,20 @@ def start_social_skills_game():
                         draw_button(screen, button_rect, (200, 200, 200), (100, 100, 100), option, button_font,
                                     (100, 100, 100))
 
-        # Резултат
         score_text = f"Поени: {score}/{len(level1_questions)}"
         draw_text_centered(screen, score_text, question_font, TEXT_COLOR, HEIGHT * 0.85)
 
     def draw_level2():
-        # Заглавие
+
         draw_text_centered(screen, "Ниво 2: Приказна за другарство", title_font, TEXT_COLOR, HEIGHT * 0.1)
 
         scene = level2_story[current_story_node]
 
-        # Емоџи икона
         emoji_font = pygame.font.SysFont("Arial", 80)
         draw_text_centered(screen, scene["image"], emoji_font, TEXT_COLOR, HEIGHT * 0.2)
 
-        # Сцена текст
         draw_text_centered(screen, scene["scene"], question_font, TEXT_COLOR, HEIGHT * 0.35, WIDTH * 0.8)
 
-        # Опции копчиња (ако не е крај)
         if not scene.get("end", False):
             button_width = WIDTH * 0.6
             button_height = HEIGHT * 0.08
@@ -310,27 +343,41 @@ def start_social_skills_game():
                 )
                 draw_button(screen, button_rect, BUTTON_COLOR, TEXT_COLOR, option_text, button_font)
         else:
-            # Копче за рестарт на приказната
+
             restart_rect = pygame.Rect(WIDTH // 2 - 150, HEIGHT * 0.75, 300, 60)
             draw_button(screen, restart_rect, BUTTON_COLOR, TEXT_COLOR, "Започни нова приказна", button_font)
 
     def draw_feedback():
         if show_feedback and feedback_text:
-            # Feedback панел
-            panel_width = WIDTH * 0.8
-            panel_height = HEIGHT * 0.15
+
+            panel_width = min(WIDTH * 0.6, 500)
+            panel_height = min(HEIGHT * 0.15, 120)
             panel_rect = pygame.Rect(
                 WIDTH // 2 - panel_width // 2,
-                HEIGHT * 0.75,
+                HEIGHT // 2 - panel_height // 2,
                 panel_width,
                 panel_height
             )
 
-            pygame.draw.rect(screen, feedback_color, panel_rect, border_radius=15, width=3)
-            pygame.draw.rect(screen, feedback_bg, panel_rect.inflate(-6, -6), border_radius=12)
+            s = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+            s.fill((*feedback_bg, 220))
+            screen.blit(s, panel_rect)
 
-            draw_text_centered(screen, feedback_text, feedback_font, feedback_color, panel_rect.centery,
-                               panel_width - 40)
+            pygame.draw.rect(screen, feedback_color, panel_rect, 3, border_radius=15)
+
+            lines = wrap_text(feedback_text, feedback_font, panel_width - 40)
+            total_height = len(lines) * feedback_font.get_height()
+            start_y = panel_rect.centery - total_height // 2
+
+            for i, line in enumerate(lines):
+                text_surf = feedback_font.render(line, True, feedback_color)
+                text_rect = text_surf.get_rect(centerx=panel_rect.centerx,
+                                               y=start_y + i * feedback_font.get_height())
+                screen.blit(text_surf, text_rect)
+
+            if feedback_bg == FEEDBACK_BG_CORRECT:
+                update_confetti()
+                draw_confetti(screen)
 
     def draw_back_button():
         back_rect = pygame.Rect(50, HEIGHT - 100, 200, 50)
@@ -373,7 +420,6 @@ def start_social_skills_game():
                         if wrong_sound:
                             wrong_sound.play()
 
-                    # Чекаме 3 секунди пред следното прашање
                     return
 
     def handle_level2_click(pos):
@@ -382,13 +428,13 @@ def start_social_skills_game():
         scene = level2_story[current_story_node]
 
         if scene.get("end", False):
-            # Restart копче
+
             restart_rect = pygame.Rect(WIDTH // 2 - 150, HEIGHT * 0.75, 300, 60)
             if restart_rect.collidepoint(pos):
                 current_story_node = "start"
                 show_feedback_message("", None)
         else:
-            # Опции копчиња
+
             button_width = WIDTH * 0.6
             button_height = HEIGHT * 0.08
             start_y = HEIGHT * 0.5
@@ -417,23 +463,23 @@ def start_social_skills_game():
             current_question += 1
 
             if current_question >= len(level1_questions):
-                # Заврши со ниво 1, премини на ниво 2
+
                 show_feedback_message(f"Го заврши Ниво 1! ({score}/{len(level1_questions)})", None)
                 game_state = "level2"
             else:
                 show_feedback_message("", None)
 
-    # Главна игра јамка
     running = True
     clock = pygame.time.Clock()
 
     while running:
         current_time = pygame.time.get_ticks()
 
-        # Скриј feedback после 5 секунди
-        if show_feedback and current_time - feedback_timer > 5000:
+        if show_feedback and current_time - feedback_timer > 3000:
             show_feedback = False
             feedback_text = ""
+            if not (game_state == "level1" and waiting_for_next):
+                confetti_particles.clear()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -444,24 +490,19 @@ def start_social_skills_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
 
-                # Назад копче
                 back_rect = draw_back_button()
                 if back_rect.collidepoint(pos):
                     from main.cpc import main
                     main()
 
-
-                # Handle clicks based on current state
                 if game_state == "level1":
                     handle_level1_click(pos)
                 elif game_state == "level2":
                     handle_level2_click(pos)
 
-        # Провери прогресија на ниво 1
         if game_state == "level1":
             check_level1_progression()
 
-        # Цртање
         screen.fill(BG_COLOR)
 
         if game_state == "level1":

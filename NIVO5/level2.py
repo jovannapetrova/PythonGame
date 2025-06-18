@@ -44,6 +44,20 @@ def start_level2():
         correct_sound = None
         wrong_sound = None
 
+    # Emotion images
+    emotions_images = {
+        "Среќно": pygame.image.load("../Pictures-Game5/среќен.png").convert_alpha(),
+        "Тажно": pygame.image.load("../Pictures-Game5/тажен.png").convert_alpha(),
+        "Луто": pygame.image.load("../Pictures-Game5/лут.png").convert_alpha(),
+        "Исплашено": pygame.image.load("../Pictures-Game5/исплашен.png").convert_alpha(),
+        "Засрамено": pygame.image.load("../Pictures-Game5/засрамен.png").convert_alpha(),
+        "Возбудено": pygame.image.load("../Pictures-Game5/возбуден.png").convert_alpha(),
+    }
+
+    # Scale images to a consistent size
+    for emotion in emotions_images:
+        emotions_images[emotion] = pygame.transform.scale(emotions_images[emotion], (100, 100))
+
     # Stories and correct answers
     stories = [
         (
@@ -214,7 +228,7 @@ def start_level2():
 
         if not game_finished:
             # Draw story background
-            story_bg_rect = pygame.Rect(50, 180, WIDTH - 100, 150)
+            story_bg_rect = pygame.Rect(40, 180, WIDTH - 100, 150)
             draw_rounded_rect(screen, story_bg_rect, colors['secondary'], 10)
 
             # Draw story text
@@ -232,6 +246,7 @@ def start_level2():
             total_width = len(current_options) * button_width + (len(current_options) - 1) * button_spacing
             start_x = (WIDTH - total_width) // 2
             button_y = 420
+            image_y = button_y + button_height + 20  # Position images below buttons with 20px spacing
 
             for i, option in enumerate(current_options):
                 button_x = start_x + i * (button_width + button_spacing)
@@ -246,6 +261,12 @@ def start_level2():
 
                 draw_button(screen, button_rect, option, button_font, button_color, colors['text'], border_color)
 
+                # Draw emotion image below the button
+                if option in emotions_images:
+                    image = emotions_images[option]
+                    image_rect = image.get_rect(centerx=button_rect.centerx, y=image_y)
+                    screen.blit(image, image_rect)
+
                 # Store button rect for click detection
                 if not hasattr(draw_game_screen, 'button_rects'):
                     draw_game_screen.button_rects = []
@@ -254,10 +275,10 @@ def start_level2():
                 else:
                     draw_game_screen.button_rects[i] = button_rect
 
-            # Draw feedback
+            # Draw feedback (positioned below images with 30px spacing)
             if show_feedback:
                 feedback_surface = feedback_font.render(feedback_text, True, feedback_color)
-                feedback_rect = feedback_surface.get_rect(centerx=WIDTH // 2, y=550)
+                feedback_rect = feedback_surface.get_rect(centerx=WIDTH // 2, y=image_y + 130)  # 100px for image + 30px spacing
                 screen.blit(feedback_surface, feedback_rect)
 
         else:

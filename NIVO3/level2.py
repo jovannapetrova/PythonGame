@@ -26,8 +26,8 @@ def start_kolicina_level2():
     cloud_w, cloud_h = 350, 160
     cloud_img = pygame.transform.scale(cropped_cloud, (cloud_w, cloud_h))
 
-    correct_sound = pygame.mixer.Sound("C:\\Users\\PC\\PycharmProjects\\CekorPoCekor\\sounds\\correct.wav")
-    wrong_sound = pygame.mixer.Sound("C:\\Users\\PC\\PycharmProjects\\CekorPoCekor\\sounds\\wrong.mp3")
+    correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
+    wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
 
     # Fonts
     FONT = pygame.font.SysFont("Comic Sans MS", 26)

@@ -4,11 +4,9 @@ import random
 
 
 def start_spatial_game():
-    # Initialize pygame
     pygame.init()
     pygame.mixer.init()
 
-    # Screen setup
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     WIDTH, HEIGHT = screen.get_size()
     pygame.display.set_caption("Просторен однос: Лева и десна рака - Три нивоа")
@@ -65,7 +63,7 @@ def start_spatial_game():
     toy_book_img = load_image("../Pictures-Game2/book.png", (80, 80))
 
     # Game state variables
-    current_screen = "level_selection"  # level_selection, game, location_game, completion
+    current_screen = "level_selection"
     current_level = None
     current_step = 0
     total_steps = 0

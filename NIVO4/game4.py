@@ -7,15 +7,13 @@ import os
 
 
 def run_macedonian_game():
-    """Main function to run the Macedonian letter learning game"""
-    # Initialize Pygame
     pygame.init()
     pygame.mixer.init()
 
     # Set up fullscreen display
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     WIDTH, HEIGHT = screen.get_size()
-    pygame.display.set_caption("🎮 Игра: Која слика започнува со буквата? 🎮")
+    pygame.display.set_caption(" Игра: Која слика започнува со буквата? ")
 
     # Fonts
     title_font = pygame.font.SysFont("Arial", 22, bold=True)
@@ -23,7 +21,7 @@ def run_macedonian_game():
     feedback_font = pygame.font.SysFont("Arial", 24, bold=True)
     big_font = pygame.font.SysFont("Arial", 32, bold=True)
     small_font = pygame.font.SysFont("Arial", 16)
-    text_font = pygame.font.SysFont("Arial", 24)  # Larger font for level 3 text
+    text_font = pygame.font.SysFont("Arial", 24)
 
     # Colors
     BG_COLOR = (224, 246, 255)
@@ -37,8 +35,8 @@ def run_macedonian_game():
     LEVEL3_COLOR = (255, 215, 0)
     BACK_BUTTON_COLOR = (255, 69, 0)
     BACK_BUTTON_HOVER = (255, 99, 71)
-    TEXT_BG_COLOR = (240, 248, 255)  # Light background for text in level 3
-    TEXT_BORDER_COLOR = (100, 149, 237)  # Border color for text box
+    TEXT_BG_COLOR = (240, 248, 255)
+    TEXT_BORDER_COLOR = (100, 149, 237)
 
     # Macedonian Cyrillic alphabet
     MACEDONIAN_ALPHABET = "АБВГДЃЕЖЗЅИЈКЛЉМНЊОПРСТЌУФХЦЧЏШ"
@@ -70,14 +68,6 @@ def run_macedonian_game():
             placeholder.fill((200, 200, 200))
             loaded_images[word] = placeholder
 
-    # Load background image for celebration
-    try:
-        celebration_bg = pygame.image.load("../Pictures-Game4/background_image.png")
-        celebration_bg = pygame.transform.scale(celebration_bg, (WIDTH, HEIGHT))
-    except:
-        celebration_bg = pygame.Surface((WIDTH, HEIGHT))
-        celebration_bg.fill(BG_COLOR)
-
     # Unicode normalization functions
     def normalize_mk(text):
         return unicodedata.normalize('NFC', text.lower())
@@ -89,14 +79,28 @@ def run_macedonian_game():
         return normalize_mk(text).startswith(normalize_mk(substring))
 
     # Load random texts from a file
-    def load_random_text():
-        try:
-            with open('random_texts.txt', 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-            return random.choice(lines).strip()
-        except:
-            return "Македонија е убава земја. Живееме во мир и хармонија."
+    #def load_random_text():
+    #    try:
+     #       with open('random_texts.txt', 'r', encoding='utf-8') as file:
+      #          lines = file.readlines()
+       #     return random.choice(lines).strip()
+        #except:
+         #   return "Македонија е убава земја. Живееме во мир и хармонија."
 
+    def load_random_text():
+        texts = [
+            "Ми се допаѓа да играм надвор.",
+            "Сонцето светка над реката.",
+            "Цветовите во градината се убави.",
+            "Децата играат фудбал во паркот.",
+            "Мојот најдобар пријател доаѓа на гости.",
+            "Зелениот чај е многу здрав.",
+            "Денес е прекрасен ден за експлорација.",
+            "Книгите се извор на знаење.",
+            "Училиштето е одлично место за учење.",
+            "Семејството ми е најважно во животот."
+        ]
+        return random.choice(texts)
     # Play sound function
     def play_sound(file_path):
         try:
@@ -256,7 +260,7 @@ def run_macedonian_game():
             for particle in confetti_particles:
                 particle.draw(surface)
 
-    def show_game_feedback(text, color, duration=2000):
+    def show_game_feedback(text, color, duration=800):
         nonlocal show_feedback, feedback_text, feedback_color, feedback_timer
         show_feedback = True
         feedback_text = text
@@ -276,30 +280,30 @@ def run_macedonian_game():
                 if button.state != "disabled":
                     selected_correct += 1
                     button.state = "correct"
-                    button.text = "✓ ТОЧНО"
+                    button.text = " ТОЧНО"
 
                     if selected_correct == total_correct:
                         progress += 1
                         if progress >= progress_needed:
                             level += 1
                             progress = 0
-                            show_game_feedback("Честитки! Помина на ниво " + str(level) + "!", (0, 0, 255))
+                            show_game_feedback("Честитки! Помина на ниво " + str(level) + "!", (0, 0, 255), 1000)
                         else:
-                            show_game_feedback("БРАВО! Ги избравте сите точни слики! 🎉", (34, 139, 34))
-                        play_sound("sounds/clap.mp3")
+                            show_game_feedback("БРАВО! Ги избравте сите точни слики! ", (34, 139, 34))
+                        play_sound("../sounds/correct.wav")
                         start_confetti()
                         pygame.time.wait(2000)
                         start_game()
                     else:
                         show_game_feedback(f"Точно! Избрана е {selected_correct} од {total_correct} точни слики.",
-                                           (34, 139, 34))
-                        play_sound("sounds/correct.mp3")
+                                           (34, 139, 34),99999)
+                        play_sound("../sounds/correct.wav")
                 else:
-                    show_game_feedback("Обиди се повторно! Ти можеш! 💪", (255, 68, 68))
+                    show_game_feedback("Обиди се повторно! Ти можеш! ", (255, 68, 68))
             else:
                 button.state = "wrong"
                 button.text = "✗ ГРЕШКА"
-                show_game_feedback("Обиди се повторно! Ти можеш! 💪", (255, 68, 68))
+                show_game_feedback("Обиди се повторно! Ти можеш! ", (255, 68, 68))
                 play_sound("sounds/try_again.mp3")
                 pygame.time.wait(1500)
                 button.state = "normal"
@@ -307,7 +311,7 @@ def run_macedonian_game():
         else:
             if selected_word == correct_word:
                 button.state = "correct"
-                button.text = "✓ ТОЧНО"
+                button.text = " ТОЧНО"
                 progress += 1
 
                 if (level == 1 and progress >= progress_needed) or (level == 3 and progress >= progress_needed):
@@ -316,20 +320,20 @@ def run_macedonian_game():
                     else:
                         level += 1
                         progress = 0
-                        show_game_feedback("Честитки! Помина на ниво " + str(level) + "!", (0, 0, 255))
+                        show_game_feedback("Честитки! Помина на ниво " + str(level) + "!", (0, 0, 255), 1000)
                         pygame.time.wait(2000)
                         start_game()
                 else:
-                    show_game_feedback("БРАВО! 🎉", (34, 139, 34))
+                    show_game_feedback("БРАВО! ", (34, 139, 34))
                     pygame.time.wait(2000)
                     start_game()
 
-                play_sound("sounds/clap.mp3")
+                play_sound("../sounds/correct.wav")
                 start_confetti()
             else:
                 button.state = "wrong"
                 button.text = "✗ ГРЕШКА"
-                show_game_feedback("Обиди се повторно! Ти можеш! 💪", (255, 68, 68))
+                show_game_feedback("Обиди се повторно! Ти можеш! ", (255, 68, 68))
                 play_sound("sounds/try_again.mp3")
                 pygame.time.wait(1500)
                 button.state = "normal"
@@ -374,10 +378,13 @@ def run_macedonian_game():
             displayed_words = [correct_word] + other_words
             random.shuffle(displayed_words)
 
-            start_x = (WIDTH - (3 * 250 + 2 * 60)) // 2
+
+            total_width = 3 * 200 + 2 * 40
+            start_x = (WIDTH - total_width) // 2
+
             for i, word in enumerate(displayed_words):
-                x = start_x + i * (250 + 60)
-                y = HEIGHT // 2
+                x = start_x + i * (200 + 40)
+                y = HEIGHT // 2 + 50
                 button = Button(x, y, 200, 50, "ИЗБЕРИ", word)
                 image_buttons.append(button)
 
@@ -398,11 +405,14 @@ def run_macedonian_game():
             displayed_words = correct_words + other_words
             random.shuffle(displayed_words)
 
-            start_x = (WIDTH - (len(displayed_words) * 200 + (len(displayed_words) - 1) * 40)) // 2
+            # Center alignment for level 2 - variable number of items
+            total_width = len(displayed_words) * 200 + (len(displayed_words) - 1) * 40
+            start_x = (WIDTH - total_width) // 2
+
             for i, word in enumerate(displayed_words):
                 x = start_x + i * (200 + 40)
-                y = HEIGHT // 2
-                button = Button(x, y, 180, 50, "ИЗБЕРИ", word)
+                y = HEIGHT // 2 + 50  # Moved down to align with image
+                button = Button(x, y, 200, 50, "ИЗБЕРИ", word)
                 image_buttons.append(button)
 
         elif level == 3:
@@ -438,13 +448,13 @@ def run_macedonian_game():
                 if progress >= progress_needed:
                     show_game_complete()
                 else:
-                    show_game_feedback("БРАВО! 🎉", (34, 139, 34))
-                    pygame.time.wait(2000)
+                    show_game_feedback("БРАВО! ", (34, 139, 34))
+                    pygame.time.wait(800)  # Reduced from 2000 to 800ms
                     start_game()
-                play_sound("sounds/clap.mp3")
+                play_sound("../sounds/correct.wav")
                 start_confetti()
             else:
-                show_game_feedback("Обиди се повторно! Ти можеш! 💪", (255, 68, 68))
+                show_game_feedback("Обиди се повторно! Ти можеш! ", (255, 68, 68))
                 play_sound("sounds/try_again.mp3")
                 text_input = ""
         except ValueError:
@@ -478,10 +488,10 @@ def run_macedonian_game():
 
         # Split text into words and render with highlighted target letter
         words = text.split()
-        x_pos = 70  # Start a bit more indented
+        x_pos = 70
         y = y_pos
-        max_width = WIDTH - 140  # Adjusted for the larger text box
-        line_height = 30  # Increased line height for better readability
+        max_width = WIDTH - 140
+        line_height = 30
 
         for word in words:
             word_surface = text_font.render(word + " ", True, (0, 0, 0))
@@ -494,7 +504,7 @@ def run_macedonian_game():
             for char in word:
                 char_surface = text_font.render(char, True,
                                                 (255, 0, 0) if normalize_mk(char) == normalize_mk(target_letter) else (
-                                                0, 0, 0))
+                                                    0, 0, 0))
                 surface.blit(char_surface, (current_x, y))
                 current_x += char_surface.get_width()
 
@@ -530,7 +540,7 @@ def run_macedonian_game():
                 # Handle back button click
                 if back_button.handle_event(event):
                     # pygame.quit()
-                    from main.cpc import main  # Импорт на главната функција
+                    from main.cpc import main
                     main()  # Return to main menu
                     # return
 
@@ -560,16 +570,14 @@ def run_macedonian_game():
 
         update_confetti()
 
+        # Always use the normal background color, no special celebration background
         screen.fill(BG_COLOR)
-
-        if confetti_active:
-            screen.blit(celebration_bg, (0, 0))
 
         # Draw back button (always visible)
         back_button.draw(screen)
 
         if game_complete:
-            text_surface = big_font.render("БРАВО! Ја завршивте играта! 🎉", True, (255, 215, 0))
+            text_surface = big_font.render("БРАВО! Ја завршивте играта! ", True, (255, 215, 0))
             text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
             screen.blit(text_surface, text_rect)
 
@@ -596,8 +604,8 @@ def run_macedonian_game():
                 # Draw the text with highlighted letters
                 draw_text_with_highlight(screen, game_text, target_letter, 160)
 
-                # Input field
-                input_rect = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 150, 200, 40)
+                # Input field - centered
+                input_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 150, 150, 40)
                 pygame.draw.rect(screen, (255, 255, 255), input_rect)
                 pygame.draw.rect(screen, (0, 0, 0), input_rect, width=2)
 
@@ -605,7 +613,8 @@ def run_macedonian_game():
                 screen.blit(input_text, (input_rect.x + 10, input_rect.y + 5))
 
                 label_text = text_font.render("Одговор:", True, (0, 0, 0))
-                screen.blit(label_text, (input_rect.x - 100, input_rect.y + 5))
+                label_rect = label_text.get_rect(center=(WIDTH // 2 - 200, input_rect.centery))
+                screen.blit(label_text, label_rect)
 
                 submit_rect = pygame.Rect(input_rect.right + 20, input_rect.y, 100, 40)
                 pygame.draw.rect(screen, (76, 175, 80), submit_rect, border_radius=5)
@@ -625,21 +634,25 @@ def run_macedonian_game():
                 for i, word in enumerate(displayed_words):
                     button = image_buttons[i]
 
-                    img_rect = pygame.Rect(button.rect.x - 10, button.rect.y - 200, 180, 180)
-                    screen.blit(loaded_images[word], img_rect)
+                    # Center the images above the buttons
+                    img_x = button.rect.centerx - 90  # 90 is half of 180 (image width)
+                    img_y = button.rect.y - 200  # 200px above the button
+                    img_rect = pygame.Rect(img_x, img_y, 180, 180)
 
+                    screen.blit(loaded_images[word], img_rect)
                     pygame.draw.rect(screen, (135, 206, 235), img_rect.inflate(8, 8), width=4, border_radius=5)
 
                     button.draw(screen)
 
         if show_feedback:
             feedback_surface = feedback_font.render(feedback_text, True, feedback_color)
-            feedback_rect = feedback_surface.get_rect(center=(WIDTH // 2, HEIGHT - 100))
+            feedback_rect = feedback_surface.get_rect(center=(WIDTH // 2, HEIGHT-180))
             bg_rect = feedback_rect.inflate(20, 10)
             pygame.draw.rect(screen, (255, 255, 255), bg_rect, border_radius=10)
             pygame.draw.rect(screen, (0, 0, 0), bg_rect, width=2, border_radius=10)
             screen.blit(feedback_surface, feedback_rect)
 
+        # Draw confetti on top of everything
         draw_confetti(screen)
 
         pygame.display.flip()

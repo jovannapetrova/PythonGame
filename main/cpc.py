@@ -15,7 +15,6 @@ pygame.init()
 
 BACKGROUND_COLOR = (255, 255, 255)
 
-# Enhanced button colors with gradients and better contrast
 BUTTON_COLORS = [
     (255, 102, 102),  # Soft red
     (102, 255, 102),  # Soft green
@@ -99,18 +98,16 @@ def calculate_button_positions():
 
 button_positions = calculate_button_positions()
 
-# Manually move "Бои и форми" (index 5) further down-right
+
 if len(button_positions) > 5:
     x, y = button_positions[5]
-    button_positions[5] = (x -100, y )  # adjust values to space it more
+    button_positions[5] = (x -100, y )
 
 
-# Move "Фонолошка свесност" (index 3) slightly right
 if len(button_positions) > 3:
     x, y = button_positions[3]
     button_positions[3] = (x + 60, y)
 
-# Move "Социјални вештини" (index 6) slightly left
 if len(button_positions) > 6:
     x, y = button_positions[6]
     button_positions[6] = (x - 60, y)
@@ -183,15 +180,7 @@ def draw_buttons():
             font_to_use
         )
 
-    # Enhanced back button
-    draw_enhanced_button(
-        screen,
-        (*BACK_BUTTON_POSITION, 200, 50),
-        (220, 220, 220),
-        (150, 150, 150),
-        "Назад",
-        font_large
-    )
+
 
 def draw_exit_button(surface):
         x, y = EXIT_BUTTON_POSITION
@@ -295,15 +284,7 @@ def draw_emotion_interaction_window():
         font_large
     )
 
-    # Enhanced back button
-    draw_enhanced_button(
-        screen,
-        (*BACK_BUTTON_POSITION, 200, 50),
-        (220, 220, 220),
-        (150, 150, 150),
-        "Назад",
-        font_large
-    )
+
 
     return image_surfaces
 
@@ -349,15 +330,6 @@ def display_random_emotion(image_surfaces):
 
         screen.blit(text_surface, text_rect)
 
-    # Enhanced back button
-    draw_enhanced_button(
-        screen,
-        (*BACK_BUTTON_POSITION, 200, 50),
-        (220, 220, 220),
-        (150, 150, 150),
-        "Назад",
-        font_large
-    )
 
 
 def main():
@@ -437,15 +409,6 @@ def main():
 
                 screen.blit(text_surface, text_rect)
 
-                # Enhanced back button
-                draw_enhanced_button(
-                    screen,
-                    (*BACK_BUTTON_POSITION, 200, 50),
-                    (220, 220, 220),
-                    (150, 150, 150),
-                    "Назад",
-                    font_large
-                )
 
         if random_emotion_display:
             display_random_emotion(image_surfaces)

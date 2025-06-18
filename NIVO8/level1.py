@@ -36,7 +36,7 @@ def start_drawing_game():
     }
 
     # Центриран canvas со поголема големина
-    canvas_width, canvas_height = 1200, 900
+    canvas_width, canvas_height = 1050, 700
     canvas = pygame.Surface((canvas_width, canvas_height))
     canvas.fill(WHITE)
     canvas_x = (WIDTH - canvas_width) // 2 -100

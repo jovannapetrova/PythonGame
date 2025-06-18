@@ -199,6 +199,8 @@ def start_kolicina_level2():
     show_results_btn = pygame.Rect(30, HEIGHT - 100, 200, 50)
     new_player_btn = pygame.Rect(250, HEIGHT - 100, 200, 50)
     back_level_btn = pygame.Rect(250, HEIGHT - 100, 200, 50)
+    backmenu_level_btn = pygame.Rect(470, HEIGHT - 100, 200, 50)
+
 
     # Initialize game variables
     question_text, clouds, shape, operator, correct_answer = generate_question(level)
@@ -288,7 +290,7 @@ def start_kolicina_level2():
         draw_button("Нов играч", new_player_btn)
         draw_button("Прикажи резултати", show_results_btn)
         draw_button("Претходен левел", back_level_btn)
-
+        draw_button("Главно мени", backmenu_level_btn)
         # Draw level buttons bottom right
         for i, rect in enumerate(level_buttons):
             is_active = (level == i + 1)
@@ -329,7 +331,10 @@ def start_kolicina_level2():
                     running = False
                     from NIVO3.level1 import start_kolicina_game
                     start_kolicina_game()
-
+                if backmenu_level_btn.collidepoint(mx, my):
+                    running = False
+                    from main.cpc import main
+                    main()  # Назад кон почетното мени (cpc.py)
                 # Check show results button
                 if show_results_btn.collidepoint(mx, my):
                     show_results = True

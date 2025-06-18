@@ -165,7 +165,7 @@ def start_kolicina_game():
                 line = SMALL_FONT.render(f"{player}: {scr} поени", True, BLACK)
                 screen.blit(line, (WIDTH // 2 - line.get_width() // 2, 230 + i * 35))
 
-            back_btn = draw_button("Назад", WIDTH // 2 - 70, HEIGHT - 80, 140, 70, GRAY)
+            back_btn = draw_button("Главно мени", WIDTH // 2 - 70, HEIGHT - 80, 140, 70, GRAY)
             pygame.display.flip()
 
             waiting = True
@@ -264,7 +264,7 @@ def start_kolicina_game():
         # Копчиња за левата страна (нов играч, резултати) - now taller
         new_player_btn = draw_button("Нов играч", 20, LEFT_BUTTON_Y, 180, 70, GRAY)
         results_btn = draw_button("Резултати", 220, LEFT_BUTTON_Y, 180, 70, GRAY)
-        back_main_btn = draw_button("Назад", 420, LEFT_BUTTON_Y, 180, 70, GRAY)
+        back_main_btn = draw_button("Главно мени", 420, LEFT_BUTTON_Y, 180, 70, GRAY)
         next_btn = draw_button("Следно", 620, LEFT_BUTTON_Y, 180, 70, (180, 180, 255))
 
         # Копчиња за ниво - доле десно, хоризонтално - now taller

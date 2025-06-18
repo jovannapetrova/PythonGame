@@ -85,10 +85,11 @@ def start_motorika_level2():
     pizza_area_pos = (WIDTH // 2 - pizza_size[0] // 2, HEIGHT * 0.58 - pizza_size[1] // 2)
     placed_positions = [None] * len(correct_order)
 
-    button_width = 140
+    button_width = 250
     button_height = 50
     restart_button_rect = pygame.Rect(WIDTH - button_width - 20, 20, button_width, button_height)
     back_button_rect = pygame.Rect(20, 20, button_width, button_height)
+    backmenu_button_rect = pygame.Rect(290, 20, button_width, button_height)
 
     def draw_button(rect, text, color, font, screen):
         pygame.draw.rect(screen, color, rect, border_radius=5)
@@ -129,7 +130,9 @@ def start_motorika_level2():
         if current_index > 0:
             screen.blit(pizza_stages[current_index - 1], pizza_area_pos)
         draw_button(restart_button_rect, "Restart", LIGHT_BROWN, font, screen)
-        draw_button(back_button_rect, "Назад", LIGHT_BROWN, font, screen)
+        draw_button(back_button_rect, "Претходен левел", LIGHT_BROWN, font, screen)
+        draw_button(backmenu_button_rect, "Главно мени", LIGHT_BROWN, font, screen)
+
         if game_completed:
             text = font.render("Браво! Ја направи тортата!", True, GREEN)
             screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 300))
@@ -155,6 +158,10 @@ def start_motorika_level2():
                     running = False
                     from NIVO1.level1 import start_motorika_game
                     start_motorika_game()
+                elif backmenu_button_rect.collidepoint(mouse_pos):
+                    running = False
+                    from main.cpc import main
+                    main()
                 elif not game_completed:
                     for ing in reversed(ingredients):
                         if ing["rect"].collidepoint(event.pos):

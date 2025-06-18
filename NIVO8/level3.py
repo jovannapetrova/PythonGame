@@ -194,7 +194,14 @@ def level3(screen):
         ref_bg.fill((255, 255, 255, 200))
         screen.blit(ref_bg, (final_x - 10, final_y - 10))
         screen.blit(final_image, (final_x, final_y))
-
+        backmenu_btn, backmenu_hovered = draw_button(
+            screen_width // 2 + 260,
+            screen_height // 2 - 310,
+            200, 50,
+            "Главно мени",
+            (200, 0, 0),
+            (230, 0, 0)
+        )
         restart_btn, restart_hovered = draw_button(
             palette_start_x + 600,
             palette_y + palette_radius - 60,
@@ -206,7 +213,7 @@ def level3(screen):
 
         back_btn, back_hovered = draw_button(
             screen_width // 2 + 260,
-            screen_height // 2 - 385,  # Помалку од 220
+            screen_height // 2 - 385,
             200, 50,
             "Назад",
             (200, 0, 0),
@@ -224,7 +231,7 @@ def level3(screen):
                 (0, 230, 0)
             )
 
-        current_hovered = restart_btn if restart_hovered else next_btn if next_hovered else back_btn if back_hovered else None
+        current_hovered = restart_btn if restart_hovered else next_btn if next_hovered else back_btn if back_hovered else backmenu_btn if backmenu_hovered else None
         if button_sound and current_hovered != prev_hovered_button:
             button_sound.play()
         prev_hovered_button = current_hovered
@@ -287,7 +294,12 @@ def level3(screen):
                         running = False
                         from NIVO8.level1 import start_drawing_game
                         start_drawing_game()
-
+                    elif backmenu_btn.collidepoint(mx, my):
+                        if button_click_sound:
+                            button_click_sound.play()
+                        running = False
+                        from main.cpc import main
+                        main()
                     elif finished and next_btn and next_btn.collidepoint(mx, my):
                         if button_click_sound:
                             button_click_sound.play()

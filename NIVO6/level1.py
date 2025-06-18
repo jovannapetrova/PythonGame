@@ -293,7 +293,7 @@ def start_colorsAndshapes_game():
         back_btn_x = results_btn.right - 470
         back_btn_width = 150
         back_btn = pygame.Rect(back_btn_x, btn_y, back_btn_width, 90)
-        draw_button(screen, back_btn, "Назад", font_small,
+        draw_button(screen, back_btn, "Главно мени", font_small,
                     (100, 100, 255), COLOR_BUTTON_HIGHLIGHT, (0, 0, 150))
         return {
             "results": results_btn,

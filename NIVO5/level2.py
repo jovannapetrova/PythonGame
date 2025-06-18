@@ -318,7 +318,7 @@ def start_level2():
 
         # Draw back button
         back_button_rect = pygame.Rect(50, HEIGHT - 80, 150, 50)
-        draw_button(screen, back_button_rect, "Назад", button_font, colors['secondary'], colors['text'],
+        draw_button(screen, back_button_rect, "Главно мени", button_font, colors['secondary'], colors['text'],
                     colors['cyan'])
         draw_game_screen.back_button_rect = back_button_rect
 

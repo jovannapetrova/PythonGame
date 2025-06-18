@@ -421,7 +421,7 @@ def start_emotion_game():
             # Draw back button during gameplay
             back_rect = pygame.Rect(20, 20, 120, 50)
             draw_rounded_rect(screen, back_rect, colors['error'], 10)
-            back_text = button_font.render("НАЗАД", True, colors['text'])
+            back_text = button_font.render("Главно мени", True, colors['text'])
             back_text_rect = back_text.get_rect()
             back_text_rect.center = back_rect.center
             screen.blit(back_text, back_text_rect)

@@ -90,7 +90,7 @@ def start_motorika_game():
     pizza_area_pos = (WIDTH // 2 - pizza_size[0] // 2, HEIGHT * 0.58 - pizza_size[1] // 2)
     placed_positions = [None] * len(correct_order)
 
-    button_width = 140
+    button_width = 220
     button_height = 50
     button_padding = 10
     back_button_rect = pygame.Rect(20, 20, button_width, button_height)
@@ -137,7 +137,7 @@ def start_motorika_game():
 
         if current_index > 0:
             screen.blit(pizza_stages[current_index - 1], pizza_area_pos)
-        draw_button(back_button_rect, "Назад", LIGHT_BROWN, font, screen)
+        draw_button(back_button_rect, "Главно мени", LIGHT_BROWN, font, screen)
         draw_button(restart_button_rect, "Restart", LIGHT_BROWN, font, screen)
         if game_completed:
             draw_button(next_button_rect, "Следно", BROWN, font, screen)

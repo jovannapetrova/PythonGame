@@ -331,6 +331,12 @@ def start_level2():
         button_width,
         button_height
     )
+    backmenu_player_button_rect = pygame.Rect(
+        boxes["blue"].centerx - button_width // 2 + 540,
+        boxes["blue"].bottom + 40,
+        button_width+50,
+        button_height
+    )
     results_button_rect = pygame.Rect(
         boxes["blue"].centerx - button_width // 2,
         boxes["blue"].bottom + 40,
@@ -379,6 +385,9 @@ def start_level2():
                 elif back_player_button_rect.collidepoint(pos):
                     from NIVO6.level1 import start_colorsAndshapes_game
                     start_colorsAndshapes_game()
+                elif backmenu_player_button_rect.collidepoint(pos):
+                    from main.cpc import main
+                    main()
                 else:
                     # Проверка за предмети
                     for item in items:
@@ -438,6 +447,7 @@ def start_level2():
         draw_simple_button(screen, results_button_rect, blue_button_color, blue_border_color, "Резултати", font)
         draw_simple_button(screen, new_player_button_rect, red_button_color, red_border_color, "Нов играч", font)
         draw_simple_button(screen, back_player_button_rect, gray_button_color, gray_border_color, "Назад", font)
+        draw_simple_button(screen, backmenu_player_button_rect, gray_button_color, gray_border_color, "Главно мени", font)
 
         pygame.display.flip()
         clock.tick(60)

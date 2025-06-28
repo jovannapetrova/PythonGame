@@ -3,7 +3,7 @@ import sys
 import random
 import math
 from NIVO1.level1 import start_motorika_game
-from NIVO2.game7 import start_spatial_game
+from NIVO2.level1 import start_spatial2_game
 from NIVO3.level1 import start_kolicina_game
 from NIVO5.level1 import start_emotion_game
 from NIVO6.level1 import start_colorsAndshapes_game
@@ -70,13 +70,11 @@ def calculate_button_positions():
 
 
     if len(game_parts) == 8:
-        # Create a flower-like pattern with one center and 7 around
+
         center_x, center_y = screen_width // 2, screen_height // 2 - 50
 
-        # Center button
         positions.append((center_x - 140, center_y - 50))
 
-        # Surrounding buttons in a circle
         radius = 280
         for i in range(1, len(game_parts)):
             angle = 2 * math.pi * (i - 1) / 7 - math.pi / 2  # Start from top
@@ -84,7 +82,6 @@ def calculate_button_positions():
             y = center_y + int(radius * math.sin(angle)) - 50
             positions.append((x, y))
     else:
-        # Fallback to circular arrangement
         radius = 350
         center_x, center_y = screen_width // 2, screen_height // 2 - 50
         for i in range(len(game_parts)):
@@ -114,13 +111,11 @@ if len(button_positions) > 6:
 
 BACK_BUTTON_POSITION = (screen_width // 2 - 100, screen_height - 120)
 
-# Enhanced fonts
 font_large = pygame.font.Font(pygame.font.match_font("arial"), 24)
 font_medium = pygame.font.Font(pygame.font.match_font("arial"), 20)
 
 
 def draw_enhanced_button(surface, rect, color, border_color, text, font, hover=False):
-    """Draw a button with shadow, gradient effect, and better styling"""
     x, y, width, height = rect
 
     # Draw shadow
@@ -128,7 +123,6 @@ def draw_enhanced_button(surface, rect, color, border_color, text, font, hover=F
     shadow_rect = (x , y , width, height)
     pygame.draw.rect(surface, (0, 0, 0, 50), shadow_rect, border_radius=15)
 
-    # Draw button background with slight gradient effect
     if hover:
         # Lighter color when hovered
         button_color = tuple(min(255, c + 30) for c in color)
@@ -145,26 +139,21 @@ def draw_enhanced_button(surface, rect, color, border_color, text, font, hover=F
     highlight_color = tuple(min(255, c + 40) for c in button_color)
     pygame.draw.rect(surface, highlight_color, (x + 3, y + 3, width - 6, 8), border_radius=10)
 
-    # Text with shadow
     text_surface = font.render(text, True, (0, 0, 0))
 
 
-    # Center the text
     text_rect = text_surface.get_rect(center=(x + width // 2, y + height // 2))
     #shadow_rect = text_shadow.get_rect(center=(x + width // 2 + 2, y + height // 2 + 2))
 
-    # Draw text shadow first, then main text
 
     surface.blit(text_surface, text_rect)
 
 
 def draw_buttons():
-    """Draw all main menu buttons with enhanced styling"""
     for i, position in enumerate(button_positions):
         color = BUTTON_COLORS[i % len(BUTTON_COLORS)]
         border_color = BUTTON_BORDER_COLORS[i % len(BUTTON_BORDER_COLORS)]
 
-        # Use smaller font for longer text
         text = game_parts[i]
         if len(text) > 12:
             font_to_use = font_medium
@@ -192,7 +181,7 @@ def draw_exit_button(surface):
         # Border
         pygame.draw.rect(surface, (180, 0, 0), (x, y, width, height), width=3, border_radius=10)
 
-        # Draw "X"
+
         font_exit = pygame.font.Font(pygame.font.match_font("arial"), 32)
         text_surface = font_exit.render("X", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(x + width // 2, y + height // 2))
@@ -221,7 +210,7 @@ def draw_emotion_images():
             image_surfaces.append(image_surface)
         except pygame.error as e:
             print(f"Грешка при учитавање на сликата {image}: {e}")
-            # Create placeholder colored rectangle
+
             placeholder = pygame.Surface((target_width, target_height))
             placeholder.fill((200, 200, 200))
             image_surfaces.append(placeholder)
@@ -233,7 +222,7 @@ RANDOM_BUTTON_POSITION = (screen_width // 2 - 125, screen_height // 2 + 120)
 
 
 def draw_emotion_interaction_window():
-    # Gradient background
+
     for y in range(screen_height):
         color_ratio = y / screen_height
         r = int(240 + (255 - 240) * color_ratio)
@@ -249,7 +238,7 @@ def draw_emotion_interaction_window():
     title_rect = title_text.get_rect(center=(screen_width // 2, 80))
     screen.blit(title_text, title_rect)
 
-    # Arrange emotion images in a 2x2 grid
+
     target_width = 250
     target_height = 250
     spacing = 50
@@ -263,7 +252,7 @@ def draw_emotion_interaction_window():
             x = start_x + col * (target_width + spacing)
             y = start_y + row * (target_height + spacing)
 
-            # Draw image with border
+
             border_rect = (x - 5, y - 5, target_width + 10, target_height + 10)
             pygame.draw.rect(screen, (100, 100, 100), border_rect, border_radius=15)
 
@@ -274,7 +263,7 @@ def draw_emotion_interaction_window():
             img_rect = image_surface.get_rect(center=image_center)
             screen.blit(image_surface, img_rect)
 
-    # Enhanced random button
+
     draw_enhanced_button(
         screen,
         (*RANDOM_BUTTON_POSITION, 250, 60),
@@ -290,7 +279,7 @@ def draw_emotion_interaction_window():
 
 
 def display_random_emotion(image_surfaces):
-    # Gradient background
+
     for y in range(screen_height):
         color_ratio = y / screen_height
         r = int(255 - 50 * color_ratio)
@@ -300,12 +289,12 @@ def display_random_emotion(image_surfaces):
 
     random_emotion = random.choice([img for img in image_surfaces if img is not None])
     if random_emotion:
-        # Draw image with decorative border
+
         img_size = 300
         x = (screen_width - img_size) // 2
         y = (screen_height - img_size) // 2 - 80
 
-        # Decorative border
+
         border_size = img_size + 20
         border_x = x - 10
         border_y = y - 10
@@ -313,17 +302,14 @@ def display_random_emotion(image_surfaces):
         pygame.draw.rect(screen, (100, 150, 200), (border_x, border_y, border_size, border_size), border_radius=20)
         pygame.draw.rect(screen, (255, 255, 255), (x, y, img_size, img_size), border_radius=15)
 
-        # Scale and center the image
         scaled_emotion = pygame.transform.scale(random_emotion, (img_size - 20, img_size - 20))
         image_rect = scaled_emotion.get_rect(center=(x + img_size // 2, y + img_size // 2))
         screen.blit(scaled_emotion, image_rect)
 
-        # Question text with background
         question_font = pygame.font.Font(pygame.font.match_font("arial"), 32)
         text_surface = question_font.render("Која е оваа емоција?", True, (50, 50, 100))
         text_rect = text_surface.get_rect(center=(screen_width // 2, y + img_size + 80))
 
-        # Text background
         text_bg_rect = text_rect.inflate(40, 20)
         pygame.draw.rect(screen, (255, 255, 255, 200), text_bg_rect, border_radius=15)
         pygame.draw.rect(screen, (100, 150, 200), text_bg_rect, width=3, border_radius=15)
@@ -370,7 +356,7 @@ def main():
                         if i == 0:
                             start_motorika_game()
                         elif i == 1:
-                            start_spatial_game()
+                            start_spatial2_game()
                         elif i == 2:
                             start_kolicina_game()
                         elif i == 5:
@@ -385,11 +371,10 @@ def main():
                             run_macedonian_game()
 
         if active_window is not None:
-            if active_window == 4:  # Emotional interaction
+            if active_window == 4:
                 if not random_emotion_display:
                     image_surfaces = draw_emotion_interaction_window()
             else:
-                # Gradient background for other windows
                 for y in range(screen_height):
                     color_ratio = y / screen_height
                     r = int(240 + (255 - 240) * color_ratio)

@@ -35,12 +35,12 @@ def start_drawing_game():
         "тешко": pygame.image.load("../Pictures-Game8/car.png")
     }
 
-    # Центриран canvas со поголема големина
+
     canvas_width, canvas_height = 1050, 700
     canvas = pygame.Surface((canvas_width, canvas_height))
     canvas.fill(WHITE)
     canvas_x = (WIDTH - canvas_width) // 2 -100
-    canvas_y = 80  # малку погоре за повеќе простор
+    canvas_y = 80
 
     current_level = "лесно"
 
@@ -52,7 +52,7 @@ def start_drawing_game():
         "средно": pygame.Rect(WIDTH - 380, HEIGHT - 70, 80, 50),
         "тешко": pygame.Rect(WIDTH - 290, HEIGHT - 70, 80, 50),
         "go_to_level2": pygame.Rect(390, HEIGHT - 70, 220, 50),
-        "go_to_level3": pygame.Rect(620, HEIGHT - 70, 220, 50),
+        #"go_to_level3": pygame.Rect(620, HEIGHT - 70, 220, 50),
         "back": pygame.Rect(920, HEIGHT - 70, 220, 50),
 
 
@@ -110,7 +110,7 @@ def start_drawing_game():
                 "show_scores": "Прикажи резултати",
                 "finish": "Заврши цртање",
                 "go_to_level2":"Следен левел 2",
-                "go_to_level3": "Следен левел 3",
+                #"go_to_level3": "Следен левел 3",
                 "back": "Назад",
             }[key], rect)
 
@@ -134,10 +134,10 @@ def start_drawing_game():
                     start_coloring_level()
 
 
-                elif buttons["go_to_level3"].collidepoint(mx, my):
+                #elif buttons["go_to_level3"].collidepoint(mx, my):
 
-                    running = False
-                    level3(screen)
+                 #   running = False
+                  #  level3(screen)
 
                 elif buttons["back"].collidepoint(mx, my):
 

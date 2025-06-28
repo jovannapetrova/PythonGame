@@ -38,7 +38,7 @@ def run_macedonian_game():
     TEXT_BG_COLOR = (240, 248, 255)
     TEXT_BORDER_COLOR = (100, 149, 237)
 
-    # Macedonian Cyrillic alphabet
+
     MACEDONIAN_ALPHABET = "АБВГДЃЕЖЗЅИЈКЛЉМНЊОПРСТЌУФХЦЧЏШ"
 
     # Image paths dictionary
@@ -405,13 +405,13 @@ def run_macedonian_game():
             displayed_words = correct_words + other_words
             random.shuffle(displayed_words)
 
-            # Center alignment for level 2 - variable number of items
+
             total_width = len(displayed_words) * 200 + (len(displayed_words) - 1) * 40
             start_x = (WIDTH - total_width) // 2
 
             for i, word in enumerate(displayed_words):
                 x = start_x + i * (200 + 40)
-                y = HEIGHT // 2 + 50  # Moved down to align with image
+                y = HEIGHT // 2 + 50
                 button = Button(x, y, 200, 50, "ИЗБЕРИ", word)
                 image_buttons.append(button)
 
@@ -449,7 +449,7 @@ def run_macedonian_game():
                     show_game_complete()
                 else:
                     show_game_feedback("БРАВО! ", (34, 139, 34))
-                    pygame.time.wait(800)  # Reduced from 2000 to 800ms
+                    pygame.time.wait(800)
                     start_game()
                 play_sound("../sounds/correct.wav")
                 start_confetti()
@@ -486,7 +486,7 @@ def run_macedonian_game():
         pygame.draw.rect(surface, TEXT_BG_COLOR, text_box, border_radius=10)
         pygame.draw.rect(surface, TEXT_BORDER_COLOR, text_box, width=2, border_radius=10)
 
-        # Split text into words and render with highlighted target letter
+        # Split text into words
         words = text.split()
         x_pos = 70
         y = y_pos
@@ -508,7 +508,7 @@ def run_macedonian_game():
                 surface.blit(char_surface, (current_x, y))
                 current_x += char_surface.get_width()
 
-            # Add space after word
+
             space_width = text_font.size(" ")[0]
             x_pos = current_x + space_width
 
@@ -570,7 +570,7 @@ def run_macedonian_game():
 
         update_confetti()
 
-        # Always use the normal background color, no special celebration background
+
         screen.fill(BG_COLOR)
 
         # Draw back button (always visible)
@@ -604,7 +604,7 @@ def run_macedonian_game():
                 # Draw the text with highlighted letters
                 draw_text_with_highlight(screen, game_text, target_letter, 160)
 
-                # Input field - centered
+                # Input field
                 input_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 150, 150, 40)
                 pygame.draw.rect(screen, (255, 255, 255), input_rect)
                 pygame.draw.rect(screen, (0, 0, 0), input_rect, width=2)
@@ -634,9 +634,9 @@ def run_macedonian_game():
                 for i, word in enumerate(displayed_words):
                     button = image_buttons[i]
 
-                    # Center the images above the buttons
-                    img_x = button.rect.centerx - 90  # 90 is half of 180 (image width)
-                    img_y = button.rect.y - 200  # 200px above the button
+
+                    img_x = button.rect.centerx - 90
+                    img_y = button.rect.y - 200
                     img_rect = pygame.Rect(img_x, img_y, 180, 180)
 
                     screen.blit(loaded_images[word], img_rect)
@@ -652,7 +652,7 @@ def run_macedonian_game():
             pygame.draw.rect(screen, (0, 0, 0), bg_rect, width=2, border_radius=10)
             screen.blit(feedback_surface, feedback_rect)
 
-        # Draw confetti on top of everything
+        # Draw confetti
         draw_confetti(screen)
 
         pygame.display.flip()

@@ -140,14 +140,14 @@ def start_colorsAndshapes_game():
         # Цртање само едноставен полукруг
         pygame.draw.rect(surface, base_color, rect, border_radius=border_radius)
 
-        # Светла нијанса како тенка рамка (не создава ефект на второ копче)
+        # Светла нијанса како тенка рамка
         border_color = lighten_color(base_color, 0.4)
         pygame.draw.rect(surface, border_color, rect, width=3, border_radius=border_radius)
 
-        # Ако е активен, додај мала проѕирност врз копчето
+        # Ако е активен,  мала проѕирност врз копчето
         if is_active:
             s = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-            s.fill((*COLOR_BUTTON_ACTIVE[:3], 80))  # мала проѕирност
+            s.fill((*COLOR_BUTTON_ACTIVE[:3], 80))
             surface.blit(s, rect.topleft)
 
         # Текст и икона
@@ -164,8 +164,8 @@ def start_colorsAndshapes_game():
     def draw_player_info():
         width, height = screen.get_size()
 
-        # Player box (left) - помал и поинаку позициониран
-        player_box = pygame.Rect(260, 20, 250, 70)  # Помала ширина
+        # Player box
+        player_box = pygame.Rect(260, 20, 250, 70)
         pygame.draw.rect(screen, COLOR_PLAYER_BOX, player_box, border_radius=12)
 
         if panda_image:
@@ -175,7 +175,7 @@ def start_colorsAndshapes_game():
         player_text = font_small.render(f"{current_player}", True, (0, 0, 0))
         screen.blit(player_text, (player_box.left + 50, player_box.centery - player_text.get_height() // 2))
 
-        # Score box (right) - помал
+        # Score box
         score_box = pygame.Rect(width - 500, 20, 250, 70)
         pygame.draw.rect(screen, COLOR_SCORE_BOX, score_box, border_radius=12)
 
@@ -189,20 +189,20 @@ def start_colorsAndshapes_game():
     def draw_challenge_box():
         width, height = screen.get_size()
 
-        # Уште помала ширина (на пр. 70% од оригиналната)
-        box_width = int((width - 200) * 0.7)  # Или фиксна вредност како 600
-        x_pos = (width - box_width) // 2  # Автоматско центрирање
 
-        challenge_box = pygame.Rect(x_pos, 120, box_width, 80)  # Намалена и висина
+        box_width = int((width - 200) * 0.7)
+        x_pos = (width - box_width) // 2
+
+        challenge_box = pygame.Rect(x_pos, 120, box_width, 80)
 
         s = pygame.Surface((challenge_box.width, challenge_box.height), pygame.SRCALPHA)
         pygame.draw.rect(s, (*COLOR_TRANSPARENT_BOX[:3], 180), (0, 0, challenge_box.width, challenge_box.height),
-                         border_radius=12)  # Помали заоблени агли
+                         border_radius=12)
         pygame.draw.rect(s, COLOR_BUTTON_HIGHLIGHT, (0, 0, challenge_box.width, challenge_box.height), 2,
                          border_radius=12)
         screen.blit(s, challenge_box)
 
-        # Текстот останува ист
+
         text_surf = font_medium.render(challenge_text, True, COLOR_TEXT_DARK)
         screen.blit(text_surf, (challenge_box.centerx - text_surf.get_width() // 2,
                                 challenge_box.centery - text_surf.get_height() // 2))
@@ -227,20 +227,20 @@ def start_colorsAndshapes_game():
     def draw_objects_area():
         width, height = screen.get_size()
 
-        # Иста ширина како challenge_box за усогласеност
+
         box_width = int((width - 200) * 0.7)
         x_pos = (width - box_width) // 2
 
-        # Намалена висина за објектите
-        objects_area = pygame.Rect(x_pos, 220, box_width, height - 450)  # Помалку високо
+
+        objects_area = pygame.Rect(x_pos, 220, box_width, height - 450)
 
         # Draw the background for objects area
         pygame.draw.rect(screen, (230, 220, 205), objects_area, border_radius=12)
         pygame.draw.rect(screen, COLOR_BUTTON_HIGHLIGHT, objects_area, width=2, border_radius=12)
 
-        # Панда декорациите се прилагодени
+
         if panda_image1:
-            panda_scaled = pygame.transform.scale(panda_image1, (120, 120))  # Помали панди
+            panda_scaled = pygame.transform.scale(panda_image1, (120, 120))
             left_panda = pygame.transform.flip(panda_scaled, True, False)
             screen.blit(left_panda, (objects_area.left - 195, objects_area.centery - 180))
             screen.blit(panda_scaled, (objects_area.right + 95, objects_area.centery - 180))
@@ -284,8 +284,8 @@ def start_colorsAndshapes_game():
         draw_button(screen, hard_btn, "Тешко", font_small,
                     COLOR_RED_BUTTON, COLOR_BUTTON_HIGHLIGHT, (150, 0, 0),
                     current_level == "тешко", lion_image)
-        # Next button (нова копче веднаш десно од Hard, мала маргина 10 пкс)
-        next_btn_x = hard_btn.right + 150  # 10 пиксели од десната страна на hard_btn
+        # Next button
+        next_btn_x = hard_btn.right + 150
         next_btn_width = 150
         next_btn = pygame.Rect(next_btn_x, btn_y, next_btn_width, 90)
         draw_button(screen, next_btn, "Следно", font_small,
@@ -360,7 +360,7 @@ def start_colorsAndshapes_game():
         x_pos = (width - box_width) // 2
         objects_area = pygame.Rect(x_pos, 220, box_width, height - 450)
 
-        # Calculate safe area (smaller than objects_area to keep shapes fully visible)
+        # Calculate safe area
         safe_area = objects_area.inflate(-80, -80)
 
         # Target objects
@@ -386,7 +386,7 @@ def start_colorsAndshapes_game():
                     objects.append((color, shape, pygame.Rect(x, y, 60, 60)))
 
         # Additional random objects
-        num_to_add = max(0, 12 - len(objects))  # Reduced from 15 to 12 to have less crowding
+        num_to_add = max(0, 12 - len(objects))
         for _ in range(num_to_add):
             color = random.choice(list(colors.keys()))
             shape = random.choice(shapes)
@@ -423,15 +423,15 @@ def start_colorsAndshapes_game():
 
         if shape == "круг":
             pygame.draw.circle(screen, color, rect.center, 30)
-            pygame.draw.circle(screen, (0, 0, 0), rect.center, 30, 3)  # Thicker border
+            pygame.draw.circle(screen, (0, 0, 0), rect.center, 30, 3)
         elif shape == "квадрат":
             pygame.draw.rect(screen, color, rect, border_radius=8)
-            pygame.draw.rect(screen, (0, 0, 0), rect, 3, border_radius=8)  # Thicker border
+            pygame.draw.rect(screen, (0, 0, 0), rect, 3, border_radius=8)
         elif shape == "правоаголник":
             # Adjust rectangle dimensions to fit better
             rect_adjusted = pygame.Rect(rect.x, rect.y + 10, 80, 40)
             pygame.draw.rect(screen, color, rect_adjusted, border_radius=8)
-            pygame.draw.rect(screen, (0, 0, 0), rect_adjusted, 3, border_radius=8)  # Thicker border
+            pygame.draw.rect(screen, (0, 0, 0), rect_adjusted, 3, border_radius=8)
         elif shape == "триаголник":
             points = [
                 (rect.centerx, rect.top + 5),
@@ -464,9 +464,9 @@ def start_colorsAndshapes_game():
                 scaled_try_again = pygame.transform.scale(try_again_image, (screen_width, screen_height))
                 screen.blit(scaled_try_again, (0, 0))
 
-            try_again_text = font_big.render("ОБИДИ СЕ ПОВТОРНО!", True, (200, 0, 0))  # црвена боја
+            try_again_text = font_big.render("ОБИДИ СЕ ПОВТОРНО!", True, (200, 0, 0))
 
-            # Центрирано по x, поставено најгоре по y (пример: y = 60)
+
             screen.blit(try_again_text, (
                 screen_width // 2 - try_again_text.get_width() // 2,
                 60
@@ -526,7 +526,7 @@ def start_colorsAndshapes_game():
             for color, shape, rect in unselected_objects:
                 draw_object(color, shape, rect, False)
 
-            # Draw selected objects last (on top)
+            # Draw selected objects last
             for color, shape, rect in selected_object_list:
                 draw_object(color, shape, rect, True)
 
@@ -568,10 +568,10 @@ def start_colorsAndshapes_game():
                         players[new_player_name] = 0  # Додај го новиот играч со поени 0
                         current_player = new_player_name  # Префрли се на новиот играч
                     elif buttons["next"].collidepoint(pos):
-                        # Овде повикај ја функцијата која треба да ја стартува следната игра / ниво
+
                         bojaformalevel2()
                     elif buttons["back"].collidepoint(pos):
-                        # Овде повикај ја функцијата која треба да ја стартува следната игра / ниво
+
                         try:
                             from main.cpc import main
                             main()

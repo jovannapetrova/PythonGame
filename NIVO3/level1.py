@@ -18,7 +18,7 @@ def start_kolicina_game():
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     WIDTH, HEIGHT = screen.get_size()
 
-    # После ова, скалирај ја сликата:
+
     background_img = pygame.image.load("../Pictures-Game3/bk.png").convert()
     background_img = pygame.transform.smoothscale(background_img, (WIDTH, HEIGHT))
 
@@ -150,7 +150,7 @@ def start_kolicina_game():
     LEVEL_BUTTON_Y = HEIGHT - 80
     LEVEL_BUTTON_X_START = WIDTH - 660
     LEVEL_BUTTON_WIDTH = 200
-    LEVEL_BUTTON_HEIGHT = 70  # Taller buttons
+    LEVEL_BUTTON_HEIGHT = 70
     LEVEL_BUTTON_SPACING = 20
 
     while True:
@@ -203,12 +203,12 @@ def start_kolicina_game():
         question_rect_x = WIDTH // 2 - question_rect_width // 2
         question_rect_y = 30
 
-        # Нацртај провиден правоаголник (RGBA за провидност)
+        # провиден правоаголник (RGBA за провидност)
         question_surface = pygame.Surface((question_rect_width, question_rect_height), pygame.SRCALPHA)
         question_surface.fill((220, 220, 220, 180))
         screen.blit(question_surface, (question_rect_x, question_rect_y - 20))
 
-        # Текст "Колку" (почетокот е во правоаголникот, но поместен десно)
+        # Текст "Колку"
         question_text1 = FONT.render("Колку", True, BLACK)
         screen.blit(
             question_text1,
@@ -232,7 +232,7 @@ def start_kolicina_game():
              question_rect_y + question_rect_height // 2 - question_text2.get_height() // 2 - 20)
         )
 
-        # Поени и играч - горен лев агол
+        # Поени и играч
         score_txt = SMALL_FONT.render(f"Поени: {score}", True, BLACK)
         screen.blit(score_txt, (20, 20))
         player_txt = SMALL_FONT.render(f"Играч: {current_player}", True, BLACK)
@@ -261,13 +261,13 @@ def start_kolicina_game():
             screen.blit(txt, rect)
             option_rects.append((rect, i))
 
-        # Копчиња за левата страна (нов играч, резултати) - now taller
+        # Копчиња (нов играч, резултати...)
         new_player_btn = draw_button("Нов играч", 20, LEFT_BUTTON_Y, 180, 70, GRAY)
         results_btn = draw_button("Резултати", 220, LEFT_BUTTON_Y, 180, 70, GRAY)
         back_main_btn = draw_button("Главно мени", 420, LEFT_BUTTON_Y, 180, 70, GRAY)
         next_btn = draw_button("Следно", 620, LEFT_BUTTON_Y, 180, 70, (180, 180, 255))
 
-        # Копчиња за ниво - доле десно, хоризонтално - now taller
+        # Копчиња за ниво
         level_easy_btn = draw_button("Ниво: Лесно", LEVEL_BUTTON_X_START, LEVEL_BUTTON_Y, LEVEL_BUTTON_WIDTH,
                                      LEVEL_BUTTON_HEIGHT, GRAY if current_level != "easy" else GREEN)
         level_medium_btn = draw_button("Ниво: Средно", LEVEL_BUTTON_X_START + LEVEL_BUTTON_WIDTH + LEVEL_BUTTON_SPACING,
@@ -312,7 +312,7 @@ def start_kolicina_game():
                     result = None
                 if next_btn.collidepoint(mx, my):
                     player_scores[f"Играч {current_player}"] = score  # зачувај резултат
-                    pygame.mixer.stop()  # стопирај звук ако има
+                    pygame.mixer.stop()
                     start_kolicina_level2()  # одведи не во следното ниво
 
                 if results_btn.collidepoint(mx, my):
@@ -348,11 +348,11 @@ def start_kolicina_game():
                         selected = idx
                         if options[idx] == correct_count:
                             score += 1
-                            correct_sound.play()  # Only play correct sound when correct
+                            correct_sound.play()
                         elif options[idx] != correct_count:
                             wrong_sound.play()
                         # Генерирај ново прашање после пауза
-                        pygame.time.delay(500)  # Small delay before next question
+                        pygame.time.delay(500)
                         if current_level == "easy":
                             shapes, target_shape, correct_count = generate_shapes_easy()
                         elif current_level == "medium":

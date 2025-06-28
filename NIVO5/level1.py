@@ -144,7 +144,7 @@ def start_emotion_game():
 
     # UI Drawing functions
     def draw_rounded_rect(surface, rect, color, border_radius=0, border_color=None, border_width=0):
-        """Draw a rounded rectangle"""
+
         pygame.draw.rect(surface, color, rect, border_radius=border_radius)
         if border_color and border_width > 0:
             pygame.draw.rect(surface, border_color, rect, border_width, border_radius=border_radius)
@@ -400,7 +400,7 @@ def start_emotion_game():
 
             if current_question >= QUESTION_COUNT:
                 game_over = True
-                if score >= int(QUESTION_COUNT * 0.8):  # 80% or higher
+                if score >= int(QUESTION_COUNT * 0.8):
                     create_confetti()
             else:
                 get_next_question()

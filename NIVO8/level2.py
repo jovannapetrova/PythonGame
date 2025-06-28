@@ -26,7 +26,7 @@ pygame.display.set_caption("Бојење по броеви со click и сло�
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
 
-# После ова, скалирај ја сликата:
+
 background = pygame.image.load("../Pictures-Game8/tabla.png").convert()
 background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
 
@@ -41,13 +41,13 @@ button_font = pygame.font.SysFont("Arial", 24, bold=True)
 # Load reference image
 final_image = pygame.image.load("../Pictures-Game8/final.png").convert_alpha()
 
-# Scale both images to the same size (using final image's dimensions)
+# Scale both images to the same size
 target_width = final_image.get_width()-100
 target_height = final_image.get_height()-150
 coloring_image = pygame.transform.smoothscale(coloring_image, (target_width, target_height))
 final_image = pygame.transform.smoothscale(final_image, (target_width, target_height))
-# Position the images centered and side by side
-spacing = 50  # Space between images
+
+spacing = 50
 total_width = target_width * 2 + spacing
 start_x = (screen_width - total_width) // 2
 
@@ -55,9 +55,9 @@ bg_x = start_x
 bg_y = (screen_height - target_height) // 2 +130
 
 final_x = start_x + target_width + spacing
-final_y = bg_y  # Same Y position as coloring image
+final_y = bg_y
 
-bg_width, bg_height = target_width, target_height  # Now both images have same dimensions
+bg_width, bg_height = target_width, target_height
 
 # Color palette
 palette_colors = {
@@ -69,13 +69,13 @@ palette_colors = {
     6: (128, 0, 128)  # Purple
 }
 
-# Palette layout - horizontal at the top center but moved down by 30px
+# Palette layout
 palette_radius = 30
 palette_spacing = 25
 num_colors = len(palette_colors)
 
 palette_start_x = (screen_width - (num_colors * (2 * palette_radius + palette_spacing) - palette_spacing)) // 2 -100
-palette_y = 130  # Increased from 50 to move palette down by 30px
+palette_y = 130
 
 palette_pos = {}
 for i, num in enumerate(sorted(palette_colors.keys())):
@@ -92,7 +92,7 @@ for a in areas:
     a["color"] = None
     a["visited"] = False
 
-# Load decorative elements (add your own files)
+# Load decorative elements
 try:
     decor_left = pygame.image.load("decor_left.png").convert_alpha()
     decor_left = pygame.transform.scale(decor_left, (150, 150))
@@ -140,15 +140,15 @@ def draw_palette():
         screen.blit(text, (pos[0] - text.get_width() // 2, pos[1] - text.get_height() // 2))
 
     if selected_color:
-        # Show selected color indicator - moved to be beside the text
-        indicator_x = screen_width // 2 - 100  # Moved left to be before text
-        indicator_y = palette_y + palette_radius * 2 + 20
+        # Show selected color indicator
+        indicator_x = screen_width // 2 - 100
+        indicator_y = palette_y + palette_radius * 2 + 60
 
         pygame.draw.circle(screen, selected_color, (indicator_x, indicator_y), 25)
         pygame.draw.circle(screen, (0, 0, 0), (indicator_x, indicator_y), 25, 3)
 
         text = font.render(f"Селектирана боја: {selected_number}", True, (255, 255, 255))
-        screen.blit(text, (indicator_x + 40, indicator_y - text.get_height() // 2))  # Text to the right of circle
+        screen.blit(text, (indicator_x + 40, indicator_y - text.get_height() // 2))
 
 
 def all_colored():
@@ -156,12 +156,12 @@ def all_colored():
 
 
 def show_congrats_screen():
-    # Full screen overlay without transparency
+
     overlay = pygame.Surface((screen_width, screen_height))
     overlay.fill((0, 0, 0))
     screen.blit(overlay, (0, 0))
 
-    # Try to load confetti image and make it full screen
+
     try:
         confetti_img = pygame.image.load("confetti.png")
         confetti_bg = pygame.transform.scale(confetti_img, (screen_width, screen_height))
@@ -169,13 +169,13 @@ def show_congrats_screen():
     except:
         pass
 
-    # Congratulations text - centered
-    congrats_font = pygame.font.SysFont("Arial", 70, bold=True)  # Bigger font
+    # Congratulations text
+    congrats_font = pygame.font.SysFont("Arial", 70, bold=True)
     text1 = congrats_font.render("БРАВО!", True, (255, 255, 0))
     text2 = font.render("Сè е обоено точно!", True, (255, 255, 255))
     text3 = font.render("Кликни на 'Следна слика' за да продолжиш.", True, (255, 255, 255))
 
-    # Center all text
+
     screen.blit(text1, ((screen_width - text1.get_width()) // 2, screen_height // 2 - 100))
     screen.blit(text2, ((screen_width - text2.get_width()) // 2, screen_height // 2))
     screen.blit(text3, ((screen_width - text3.get_width()) // 2, screen_height // 2 + 50))
@@ -188,7 +188,7 @@ def draw_button(x, y, width, height, text, color, hover_color):
 
     current_color = hover_color if is_hovered else color
 
-    # Button shape with rounded corners
+
     pygame.draw.rect(screen, current_color, (x, y, width, height), border_radius=15)
 
     # Button border
@@ -265,18 +265,18 @@ def start_coloring_level():
             (230, 0, 0)
         )
 
-        next_btn, next_hovered = None, None
-        if finished:
-            next_btn, next_hovered = draw_button(
-                screen_width // 2 - 100,
-                screen_height // 2 + 150,
-                200, 50,
-                "Следна слика",
-                (0, 200, 0),
-                (0, 230, 0)
-            )
+       # next_btn, next_hovered = None, None
+        #if finished:
+         #   next_btn, next_hovered = draw_button(
+          #      screen_width // 2 - 100,
+           #     screen_height // 2 + 150,
+            #    200, 50,
+             #   "Следна слика",
+              #  (0, 200, 0),
+               # (0, 230, 0)
+            #)
 
-        current_hovered = restart_btn if restart_hovered else next_btn if next_hovered else back_btn if back_hovered else backmenu_btn if backmenu_hovered else None
+        current_hovered = restart_btn if restart_hovered else back_btn if back_hovered else backmenu_btn if backmenu_hovered else None
         if button_sound and current_hovered != prev_hovered_button:
             button_sound.play()
         prev_hovered_button = current_hovered
@@ -347,11 +347,11 @@ def start_coloring_level():
 
 
 
-                elif finished and next_btn and next_btn.collidepoint(mx, my):
-                    if button_click_sound:
-                        button_click_sound.play()
+                #elif finished and next_btn and next_btn.collidepoint(mx, my):
+                 #   if button_click_sound:
+                  #      button_click_sound.play()
                     # Instead of quitting, just break the loop to return control
-                    return "next"
+                   # return "next"
 
                 elif not finished:
                     for num, pos in palette_pos.items():

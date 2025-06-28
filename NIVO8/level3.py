@@ -2,18 +2,17 @@ import pygame
 import sys
 import json
 
-# Ако ова го викаш од друг модул, pygame.init() и mixer.init() треба да се извршат таму
-# Исто така, screen треба да е дефиниран таму или го оставаме како глобален
+
 
 def level3(screen):
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("Arial", 30)
     button_font = pygame.font.SysFont("Arial", 24, bold=True)
 
-    # Промени во подесувања за екранот (ќе ги користиме од screen)
+
     screen_width, screen_height = screen.get_size()
 
-    # Земи сликите и ги скалираме
+
     background = pygame.image.load("../Pictures-Game8/tabla.png").convert()
     background = pygame.transform.smoothscale(background, (screen_width, screen_height))
 
@@ -69,7 +68,7 @@ def level3(screen):
         a["color"] = None
         a["visited"] = False
 
-    # Load decorative elements (не мора ако ги немаш)
+    # Load decorative elements
     try:
         decor_left = pygame.image.load("decor_left.png").convert_alpha()
         decor_left = pygame.transform.scale(decor_left, (150, 150))
@@ -303,7 +302,7 @@ def level3(screen):
                     elif finished and next_btn and next_btn.collidepoint(mx, my):
                         if button_click_sound:
                             button_click_sound.play()
-                        # Врати се назад или повикај друга функција - еве само излез
+
                         running = False
 
                     elif not finished:
@@ -319,4 +318,3 @@ def level3(screen):
         pygame.display.flip()
         clock.tick(60)
 
-    # Не затворај pygame, само излез од функцијата

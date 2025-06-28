@@ -36,7 +36,7 @@ def start_level2():
     feedback_font = pygame.font.Font(None, 36)
     prompt_font = pygame.font.Font(None, 32)
 
-    # Load sounds (optional)
+    # Load sounds
     try:
         correct_sound = pygame.mixer.Sound("../sounds/correct.wav")
         wrong_sound = pygame.mixer.Sound("../sounds/wrong.mp3")
@@ -54,7 +54,7 @@ def start_level2():
         "Возбудено": pygame.image.load("../Pictures-Game5/возбуден.png").convert_alpha(),
     }
 
-    # Scale images to a consistent size
+    # Scale images
     for emotion in emotions_images:
         emotions_images[emotion] = pygame.transform.scale(emotions_images[emotion], (100, 100))
 
@@ -246,7 +246,7 @@ def start_level2():
             total_width = len(current_options) * button_width + (len(current_options) - 1) * button_spacing
             start_x = (WIDTH - total_width) // 2
             button_y = 420
-            image_y = button_y + button_height + 20  # Position images below buttons with 20px spacing
+            image_y = button_y + button_height + 20
 
             for i, option in enumerate(current_options):
                 button_x = start_x + i * (button_width + button_spacing)
@@ -275,10 +275,10 @@ def start_level2():
                 else:
                     draw_game_screen.button_rects[i] = button_rect
 
-            # Draw feedback (positioned below images with 30px spacing)
+            # Draw feedback
             if show_feedback:
                 feedback_surface = feedback_font.render(feedback_text, True, feedback_color)
-                feedback_rect = feedback_surface.get_rect(centerx=WIDTH // 2, y=image_y + 130)  # 100px for image + 30px spacing
+                feedback_rect = feedback_surface.get_rect(centerx=WIDTH // 2, y=image_y + 130)
                 screen.blit(feedback_surface, feedback_rect)
 
         else:

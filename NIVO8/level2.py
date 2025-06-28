@@ -118,6 +118,7 @@ def draw_areas():
     for a in areas:
         x, y, w, h = a["rect"]
         x += bg_x
+
         y += bg_y
         if a["color"]:
             s = pygame.Surface((w, h), pygame.SRCALPHA)
